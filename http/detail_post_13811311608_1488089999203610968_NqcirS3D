@@ -1,0 +1,12 @@
+HTTP/1.1 200 OK
+Server: nginx
+Content-Type: text/html; charset=UTF-8
+Connection: keep-alive
+Vary: Accept-Encoding
+Cache-Control: no-cache
+Date: Sun, 26 Feb 2017 03:00:23 GMT
+Set-Cookie: XSRF-TOKEN=eyJpdiI6ImtEaVZtcTZDSWI4XC9pcSt0cFdDRTBnPT0iLCJ2YWx1ZSI6IlpOcjBvUGhkTXRwY1dORkNMRjAyamFDOFVremJzREg4MG4zanpISEQ0NExPZFpISGZ3ME1MZWlcL3hFZjdkR25lbjYrOVVRdnM4bjB1d2lFUXZTY3FrQT09IiwibWFjIjoiZGViZTA0NGVkYmVhYzU3NjU2Mjc3OGExNDE1Mjg0YmE0NGViMGMzNGEyYWU5NjZkNjNkMmM4NGRjMWY1YzE5YiJ9; expires=Sun, 26-Feb-2017 05:00:23 GMT; Max-Age=7200; path=/
+Set-Cookie: zecf_session=eyJpdiI6Img5cDUxMmlidVpkT3E1bHJudHpqTHc9PSIsInZhbHVlIjoiVzV0clI0bloxOFVYVEwrZW9iRUpGWEZhejFpRDZpemRaVStMNWEzSXo3aFhjRExua2pjU0poUERyM3UyWU1WY2RNZk1QQzZiSkN6SXQ2WjJPZkdhY3c9PSIsIm1hYyI6IjJlMDEwNjE5MGMzYTY1N2ZiODJlMTlkMjc0MjFlMTdlZTliMTdmMmYwOThjOGI2OGEyMmI2NTRlYTM0Y2Y4NDkifQ%3D%3D; path=/; HttpOnly
+Content-Length: 320
+
+{"status":2,"msg":"https:\/\/www.zecaifu.com\/detail\/6462\/investor\/eyJpdiI6IkE1UjVHY0poWlpseHdNaDF0TExVdlE9PSIsInZhbHVlIjoiUlwvSVlZUXdrdVdtWkFyZjdxXC9tdDBQditTbUFzaTN2Z1dXY3lYQW04MUVIZmdKVmlQK3l6Yk5GS0thR2c1T1wvRSIsIm1hYyI6ImU1MzE1Mzg3OTAwMjNlOWJhZGJmY2ZjOTkwMzg3ZGM4MzNhY2Q4ZTFjOGM2ZDg2ZGRhMDg0NDVlZTZiODQ0NWQifQ=="}

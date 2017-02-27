@@ -1,0 +1,12 @@
+HTTP/1.1 302 Found
+Server: nginx
+Content-Type: text/html; charset=UTF-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+Cache-Control: no-cache
+Location: https://www.zecaifu.com
+Date: Mon, 27 Feb 2017 18:19:15 GMT
+Set-Cookie: XSRF-TOKEN=eyJpdiI6IkhJb0xwaEt4SWRTckZcLzY4QjFqTGtRPT0iLCJ2YWx1ZSI6IkV4cTlvcW03MlwvZnRFb0tudVwvWVVNU1wvdEE4S2hIRU5rVTdrMmxcL21kRzdXalVTWklGWXNQaFAxZUdKQ2o4TSt1RnpRVTlTY0JLQzRCMWlySnFJdFlDQT09IiwibWFjIjoiN2IxZDY3YjI5OTVmY2NjY2FhY2ZkZjFjNjU0ZWUwYmE5YzE4NmJmMzBmNzJiNDQ5ODBiZTVjZTFhMGUxMmU3NSJ9; expires=Mon, 27-Feb-2017 20:19:15 GMT; Max-Age=7200; path=/
+Set-Cookie: zecf_session=eyJpdiI6IlhEXC9neFZcLytXVEdoOFVWYm9SYW1KZz09IiwidmFsdWUiOiIwdWR6S1Y0YWQrem5mK1JmTHVZaXc5TDhCY21RWU9qVnFoTHpFVllFRDBuZEY0eXBcL0dZcEtoalllRG5mamdwUnJubk5jVTFzTEtHT1ZYSCtJMmwzK1E9PSIsIm1hYyI6IjhmMTY0Njk2MmQ2NWJkYjllMDVhM2JiYTA3MTA0NDg0MjRjODZhOGEzZTVmMzdmNDY4MDZlODg2NGRjNjE1NTAifQ%3D%3D; path=/; HttpOnly
+Set-Cookie: username=eyJpdiI6IlM5bmk2RU5hT2lWNUpSb0lLNGVYaWc9PSIsInZhbHVlIjoiNGNObkpkVkpTY1RLUjZ1dldsaFdqdz09IiwibWFjIjoiYTc4ZDdlNTllNWZjZjQwZjI4MDY4OGE3NjAwZGFhNzYxZDFiOWQyOTdiNTFlZGIzODYwYzQzN2ZmMzFlZjdhMyJ9; expires=Wed, 29-Feb-2012 18:19:15 GMT; Max-Age=-157680000; path=/; HttpOnly
+

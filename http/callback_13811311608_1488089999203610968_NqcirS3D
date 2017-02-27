@@ -1,0 +1,23 @@
+HTTP/1.1 302 Found
+Server: nginx
+Content-Type: text/html; charset=UTF-8
+Connection: keep-alive
+Cache-Control: no-cache
+Location: https://www.zecaifu.com/prompt?code=88&type=transfer&url=https%3A%2F%2Fwww.zecaifu.com%2Fprofile%2Fcrowdfunding%2Fjoin&urlName=%E5%8F%82%E4%B8%8E%E7%9A%84%E4%BC%97%E7%AD%B9
+Date: Sun, 26 Feb 2017 03:03:43 GMT
+Set-Cookie: XSRF-TOKEN=eyJpdiI6Im83dTl6QUM3eENTZ2VleFVKaFMrdEE9PSIsInZhbHVlIjoiazMyNVIzUytDRUdhckpTRHg0MUFjRVFlSUlGd0NQUlwvQUozbW5mZXpmXC9PVDdrYzhaZnR4QklrZUs0bnUydUlLd3BMUTZ2RElqUWltYWc3b2lmOHpqdz09IiwibWFjIjoiZDhjMThmNWUzNDZkNWZhNGI0NzY0OTVlNDMyZGZjMzNiZTkwNzFlNjRmMDcwMGZmYjdiZWRmNWVjMTQ2ZTlmNiJ9; expires=Sun, 26-Feb-2017 05:03:43 GMT; Max-Age=7200; path=/
+Set-Cookie: zecf_session=eyJpdiI6InVMeTZcL253cFluc1RXMEg5WkgwWFhnPT0iLCJ2YWx1ZSI6InRNM1hmY1wveTVnZ0hNQnNrMnd4WjNUdGx4VmZsUnpxWVNkT0MwMU9WcVRESU13cENyRFZjRmhleHhYVzhcL0xqUkI0RVV4NjdicmVaYmYxYkRORFwvR1dBPT0iLCJtYWMiOiJmMjljNzZkN2M0ODlhMGQ1M2QyYjk4YmFkM2QyYzNlZTg0N2JlMDViNDliMzdiZTcxMDBjNTc1MTNjYWVjNzEzIn0%3D; path=/; HttpOnly
+Content-Length: 980
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="refresh" content="1;url=https://www.zecaifu.com/prompt?code=88&amp;type=transfer&amp;url=https%3A%2F%2Fwww.zecaifu.com%2Fprofile%2Fcrowdfunding%2Fjoin&amp;urlName=%E5%8F%82%E4%B8%8E%E7%9A%84%E4%BC%97%E7%AD%B9" />
+
+        <title>Redirecting to https://www.zecaifu.com/prompt?code=88&amp;type=transfer&amp;url=https%3A%2F%2Fwww.zecaifu.com%2Fprofile%2Fcrowdfunding%2Fjoin&amp;urlName=%E5%8F%82%E4%B8%8E%E7%9A%84%E4%BC%97%E7%AD%B9</title>
+    </head>
+    <body>
+        Redirecting to <a href="https://www.zecaifu.com/prompt?code=88&amp;type=transfer&amp;url=https%3A%2F%2Fwww.zecaifu.com%2Fprofile%2Fcrowdfunding%2Fjoin&amp;urlName=%E5%8F%82%E4%B8%8E%E7%9A%84%E4%BC%97%E7%AD%B9">https://www.zecaifu.com/prompt?code=88&amp;type=transfer&amp;url=https%3A%2F%2Fwww.zecaifu.com%2Fprofile%2Fcrowdfunding%2Fjoin&amp;urlName=%E5%8F%82%E4%B8%8E%E7%9A%84%E4%BC%97%E7%AD%B9</a>.
+    </body>
+</html>
