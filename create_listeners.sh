@@ -20,6 +20,7 @@ while [ 1 -eq 1 ]; do
 			./process_bid.sh $FILE_NAME $CAR_ID &
 		done
 		mv $f tigger/"$CAR_ID"_done
+		break
 	done
 done
 

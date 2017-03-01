@@ -27,7 +27,7 @@
                     <li class="last">
                         <a href="https://www.zecaifu.com/aboutus/history.html" class="bod nm">安全运营
                             <span class="n-bod">
-                                <span class="n">771 </span>
+                                <span class="n">772 </span>
                             </span>
                             天</a>
                     </li>
@@ -57,7 +57,7 @@
             <!--登录-->
             <div class="lr-box login" id="J-login" style="display: block ">
                 <form method="POST" action="https://www.zecaifu.com/login" id="loginForm">
-                    <input type="hidden" name="_token" value="n4n0BrgYCtbo6fAGMjtZFgvJwrfJHWakUknyzSpM">
+                    <input type="hidden" name="_token" value="vfqPscahID1TikQXXaZpeYavflFmEAoLH2Rr4krm">
                     <div class="row">
                         <div class="t-box">
                             <span class="ico i-people"></span>
@@ -95,7 +95,7 @@
             <!--注册-->
             <div class="lr-box reg" id="J-reg" style="display: none ">
                 <form method="POST" action="https://www.zecaifu.com/signup" id="signupForm">
-                    <input type="hidden" name="_token" value="n4n0BrgYCtbo6fAGMjtZFgvJwrfJHWakUknyzSpM">
+                    <input type="hidden" name="_token" value="vfqPscahID1TikQXXaZpeYavflFmEAoLH2Rr4krm">
                     <div class="row">
                         <div class="l-txt">用户名</div>
                         <div class="r-inp">

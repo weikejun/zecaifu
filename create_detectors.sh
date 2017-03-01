@@ -13,6 +13,7 @@ while [ 1 -eq 1 ];do
 		if [ "${IDS[$id]}" == "1" ];then
 			continue
 		fi
+		doLog "car $id ready"
 		IDS[$id]="1"
 		echo -n $TS > tigger/"$id"_start
 	done
