@@ -11,6 +11,8 @@ for USER in $(cat user.list|sed -r "s/\s+//g");do
 	./user_login.sh $NAME $PASS
 	./get_amount.sh $NAME
 done
+
+NUM=0
 while [ 1 -eq 1 ]; do
 	for f in $(ls tigger/*_start);do
 		CAR_ID=$(basename $f _start)
@@ -20,8 +22,12 @@ while [ 1 -eq 1 ]; do
 			./process_bid.sh $FILE_NAME $CAR_ID &
 		done
 		mv $f tigger/"$CAR_ID"_done
+		NUM=$[$NUM + 1]
 		break
 	done
+	if [ $NUM -ge 1 ];then
+		break
+	fi
 done
 
 doLog "Exit"

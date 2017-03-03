@@ -30,18 +30,8 @@ for dir in $(echo "http log");do
 	doLog "Clear $dir done"
 done
 
-for f in $(ls captcha|egrep ".gif|.res"|xargs);do
-	LASTMO=$(date -d "$(stat captcha/$f|grep -i "modify"|sed -r "s/modify:\s+//ig")" +%s)
-	LASTMO=$(($LASTMO + 1800))
-	if [ $(date +%s) -gt $LASTMO ];then
-		CMD="mv -f captcha/$f captcha/archives"
-		echo $CMD
-		eval $CMD
-	fi
-done
-
 doLog "Clear process start"
-for p in $(ps -ef|egrep "process_bid|auto_ocr"|grep -v "grep"|grep -v "vim"|awk '{print $2}');do
+for p in $(ps -ef|egrep "process_bid|create_listener|create_detector"|grep -v "grep"|grep -v "vim"|awk '{print $2}');do
 	STARTED=$(date -d "$(ps -p $p -o lstart|grep -v -i STARTED)" +%s)
 	ELAPSED=$(($(date +%s) - $STARTED))
 	if [ $ELAPSED -gt 180 ];then
