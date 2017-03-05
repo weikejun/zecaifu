@@ -10,9 +10,9 @@ $doc->loadHTMLFile($argv[1]);
 $nodes = $doc->getElementsByTagName("input");
 $params = [];
 foreach($nodes as $node) {
-	if ($argv[2] == 'raw') {
+	if (isset($argv[2]) && $argv[2] == 'raw') {
 		$params[] = $node->getAttribute('name') . "=" . $node->getAttribute('value');}
-	else if ($argv[2] == 'decode') {
+	else if (isset($argv[2]) && $argv[2] == 'decode') {
 		$params[] = $node->getAttribute('name') . "=" . urldecode($node->getAttribute('value'));
 	
 	} else {

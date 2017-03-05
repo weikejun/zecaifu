@@ -13,6 +13,8 @@ for USER in $(cat user.list|sed -r "s/\s+//g");do
 done
 
 NUM=0
+# 最多抢MAX辆车
+MAX=1
 while [ 1 -eq 1 ]; do
 	for f in $(ls tigger/*_start);do
 		CAR_ID=$(basename $f _start)
@@ -25,7 +27,7 @@ while [ 1 -eq 1 ]; do
 		NUM=$[$NUM + 1]
 		break
 	done
-	if [ $NUM -ge 1 ];then
+	if [ $NUM -ge $MAX ];then
 		break
 	fi
 done
