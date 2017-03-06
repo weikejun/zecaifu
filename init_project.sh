@@ -15,3 +15,4 @@ cat config/crontab.dat >> /tmp/cron.tmp
 crontab /tmp/cron.tmp
 
 # set dependences
+apt install nodejs
