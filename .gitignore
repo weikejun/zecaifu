@@ -4,8 +4,4 @@ http/*
 amount/*
 tigger/*
 *.list*
-sess.map
-captcha/*.gif
-captcha/*.res
-captcha/archives/*
-user_map.sh
+config/strategy.dat

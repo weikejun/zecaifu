@@ -2,7 +2,7 @@
 <html>
 <head lang="en">
   <meta charset="UTF-8">
-  <title>ZeRobot - 账户设置</title>
+  <title>ZeRobot - 策略设置</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="format-detection" content="telephone=no">
@@ -31,15 +31,15 @@
 </div>
 <div class="am-g">
   <div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
-    <h3>账户设置</h3>
+    <h3>策略设置</h3>
     <hr>
     <form id="sub_form" method="post" class="am-form">
 <?php
-$file = dirname(dirname(__FILE__)).'/user.list';
+$file = dirname(dirname(__FILE__)).'/config/strategy.dat';
 $userStr = '';
-if($_POST['users']) {
-	$output = file_put_contents($file, trim($_POST['users']));
-	$userStr = trim($_POST['users']);
+if($_POST['strategys']) {
+	$output = file_put_contents($file, trim($_POST['strategys']));
+	$strategyStr = trim($_POST['strategys']);
 	echo "<script>alert('".($output !== false ? "success" : "failed")."');location.href = location;</script>";
 }
 else {
@@ -49,11 +49,11 @@ else {
 	}
 	foreach($lines as $line) {
 		$line = trim($line);
-		$userStr .= $line."\n";
+		$strategyStr .= $line."\n";
 	}
 } 
 ?>
-      <textarea autocomplete="off" name="users" id="users"><?php echo htmlspecialchars($userStr); ?></textarea>
+      <textarea autocomplete="off" name="strategys" id="strategys"><?php echo htmlspecialchars($strategyStr); ?></textarea>
       <br>
       <div class="am-cf">
         <input type="submit" name="" value="提 交" class="am-btn am-btn-primary am-btn-sm am-fl">

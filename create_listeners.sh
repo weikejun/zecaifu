@@ -12,24 +12,19 @@ for USER in $(cat user.list|sed -r "s/\s+//g");do
 	./get_amount.sh $NAME
 done
 
-NUM=0
-# 最多抢MAX辆车
-MAX=1
 while [ 1 -eq 1 ]; do
 	for f in $(ls tigger/*_start);do
-		CAR_ID=$(basename $f _start)
+		read CAR_ID CAR_NO < <(basename $f|awk -F'_' '{print $1,$2}')
 		for USER in $(cat user.list|sed -r "s/\s+//g");do
 			NAME=$(echo $USER|awk -F"|" '{print $1}')
 			FILE_NAME=$(ls cookies/|grep $NAME|grep -v "login"|tail -n 1)
-			./process_bid.sh $FILE_NAME $CAR_ID &
+			STRATEGY=$(cat config/strategy.dat|grep $NAME|grep $CAR_NO)
+			if [ "$STRATEGY" != "" ];then
+				./process_bid.sh $FILE_NAME $CAR_ID &
+			fi
 		done
 		mv $f tigger/"$CAR_ID"_done
-		NUM=$[$NUM + 1]
-		break
 	done
-	if [ $NUM -ge $MAX ];then
-		break
-	fi
 done
 
 doLog "Exit"

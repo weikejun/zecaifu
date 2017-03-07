@@ -12,7 +12,7 @@ fi
 USER=$1
 PASS=$2
 FILE_NAME=$(ls cookies/|grep $USER|grep -v "login"|tail -n 1)
-if [ $FILE_NAME != "" ]; then
+if [ "$FILE_NAME" != "" ]; then
 	doLog "login aready, user=$USER"
 	exit
 fi

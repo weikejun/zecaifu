@@ -74,7 +74,7 @@ if [ "$KEY" == "" ];then
 	doLog "[$SESSION][$CAR_ID]Exit, counter page error, pubkey=null"
 	exit
 fi
-PAYPASS=$(cat payPass.txt)
+PAYPASS=$(grep $(echo "$SESSION"|awk -F'_' '{print $1}') user.list |awk -F'|' '{print $3}')
 ENCRYPT_PAYPASS=$(node tools/encrypt.js "$KEY" "$PAYPASS")
 ENCRYPT_PAYPASS_URL=$(php tools/urlencode.php "$ENCRYPT_PAYPASS")
 PAY_ID=$(grep -Po "(?<=mid:)[0-9]+" $TRANSFER_PAGE)

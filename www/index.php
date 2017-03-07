@@ -33,7 +33,7 @@
   <div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
     <h3>导航</h3>
     <hr>
-    <div>IP: 118.190.42.82<br /><a href="http://118.190.42.82/actLog.php">操作日志</a> | <a href="http://118.190.42.82/monitor.php">状态监控</a> | <a href="http://118.190.42.82/user.php">账户设置</a></div>
+    <div><a href="http://118.190.42.82/actLog.php">操作日志</a> | <a href="http://118.190.42.82/user.php">账户设置</a> | <a href="http://118.190.42.82/strategy.php">策略设置</a></div>
     <hr>
     <p>© 2016 Jimwei </p>
   </div>

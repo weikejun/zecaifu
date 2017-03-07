@@ -4,36 +4,26 @@ cd $(dirname $0)
 source common.sh
 doLog "Start"
 
-source user_map.sh
-
-USER_NUM=${#USER_MAP[*]}
 MAIL=""
 LOCAL_IP=$(/sbin/ifconfig eth1|grep inet|sed "s/:/ /g"|awk '{print $3}')
 
-echo -n > user.list
-
-i=0
-
-while [ $i -lt $USER_NUM ];do
-	USER=$(echo ${USER_MAP[$i]}|awk -F'|' '{print $1}')
-	PASS=$(echo ${USER_MAP[$i]}|awk -F'|' '{print $2}')
+for u in $(cat user.list); do
+	read USER PASS PAYPASS MAILADDR < <(echo $u|awk -F"|" '{print $1,$2,$3,$4}')
 	./user_login.sh $USER $PASS
 	./get_amount.sh $USER
 	if [ -f amount/$USER ];then
-		AMOUNT=$(cat amount/$USER|sed -r "s/\s+//g")
-		if [ $AMOUNT != "0.00" ];then
-			echo ${USER_MAP[$i]} >> user.list
-			MAIL=$MAIL"$USER balance=$AMOUNT; "
-		fi
+		AMOUNT=$(cat amount/$USER)
+		MAIL=$MAIL"账号 $USER 就绪, 余额 $AMOUNT \n众筹策略：\n"
+	else
+		MAIL=$MAIL"账号 $USER 余额读取失败，请联系管理员"
 	fi
-	let i+=1
+
+	for s in $(cat config/strategy.dat|grep $USER|sed -r "s/\s+//g");do
+		read CAR_ID MONEY < <(echo $s|awk -F'|' '{print $2,$3}')
+		MAIL=$MAIL"第 $CAR_ID 期，投入金额 $MONEY \n"
+	done
+	echo -e $MAIL | mail -s "[ZeRobot notify]Ready - from $LOCAL_IP" -c 78250611@qq.com $MAILADDR
 done
 
-if [ "$MAIL" == "" ];then
-	#echo "zhangyongkang|wkj12345678" >> user.list
-	MAIL="no formal user"
-fi
-
-echo "$(cat user.list|wc -l) user ready; "$MAIL | mail -s "[Zecaifu notify]Ready - from $LOCAL_IP" 78250611@qq.com
 
 doLog "Exit"
