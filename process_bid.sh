@@ -104,7 +104,7 @@ if [ "$MESSAGE" != "成功" ]; then
 	exit
 fi
 
-doLog "[$SESSION][$CAR_ID]Buyin callback"
+doLog "[$SESSION][$CAR_ID]Buyin callback, message=$MESSAGE"
 FORM_DATA=$(php tools/form_serialize.php $PAY_SUBMIT_PAGE)
 curl -b $COOKIE_FILE -b $DETAIL_PAGE -b $DETAIL_POST_PAGE "https://www.zecaifu.com/detail/back" -H "Host: www.zecaifu.com" -H "Accept-Encoding: gzip, deflate, sdch, br" -H "Accept-Language: zh-CN,zh;q=0.8" -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.152 Safari/537.36" -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" -H "Referer: https://transfer.moneymoremore.com/loan/loanact.action" -H "Connection: keep-alive" -H "Upgrade-Insecure-Requests: 1" -H "Origin: https://transfer.moneymoremore.com" -H "Cache-Control: max-age=0" -H "Content-Type: application/x-www-form-urlencoded" --data "$FORM_DATA" --compressed -i -o $CALLBACK_PAGE
 BACK_URL=$(grep -Po "(?<=1;url=)[^\"]+" $CALLBACK_PAGE|sed -e "s/amp;//g")
