@@ -5,3 +5,4 @@ amount/*
 tigger/*
 *.list*
 config/strategy.dat
+user.list

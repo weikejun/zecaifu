@@ -71,11 +71,12 @@ curl "https://transfer.moneymoremore.com/loan/loan.action" -H "Host: transfer.mo
 
 KEY=$(grep -Po '(?<=publicKey = ")[^"]+' $TRANSFER_PAGE) 
 if [ "$KEY" == "" ];then
-	doLog "[$SESSION][$CAR_ID]Exit, counter page error, pubkey=null"
+	MESSAGE=$(cat $TRANSFER_PAGE|grep Message|grep -Po "(?<=value=\")[^\"]+")
+	doLog "[$SESSION][$CAR_ID]Exit, counter page error, message=$MESSAGE"
 	exit
 fi
 PAYPASS=$(grep $(echo "$SESSION"|awk -F'_' '{print $1}') user.list |awk -F'|' '{print $3}')
-ENCRYPT_PAYPASS=$(node tools/encrypt.js "$KEY" "$PAYPASS")
+ENCRYPT_PAYPASS=$(nodejs tools/encrypt.js "$KEY" "$PAYPASS")
 ENCRYPT_PAYPASS_URL=$(php tools/urlencode.php "$ENCRYPT_PAYPASS")
 PAY_ID=$(grep -Po "(?<=mid:)[0-9]+" $TRANSFER_PAGE)
 
