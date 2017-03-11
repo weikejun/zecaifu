@@ -10,4 +10,7 @@
 20 15,16 * * * (cd /usr/local/apps/zecaifu;./set_user_list.sh >> log/$(date +\%Y\%m\%d))
 # 垃圾清理程序
 * * * * * (cd /usr/local/apps/zecaifu;./clear_gar.sh >> log/clear_$(date +\%Y\%m\%d))
+# 抢标结果
+4 10,11 * * * (cd /usr/local/apps/zecaifu;./notify_response.sh >> log/$(date +\%Y\%m\%d))
+34 15,16 * * * (cd /usr/local/apps/zecaifu;./notify_response.sh >> log/$(date +\%Y\%m\%d))
 # --中E抢标任务集合

@@ -16,3 +16,4 @@ crontab /tmp/cron.tmp
 
 # set dependences
 apt install nodejs
+apt install npm
