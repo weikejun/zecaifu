@@ -61,6 +61,7 @@ var CFRobot = function(user){
 
 	this.events.on('user.login', () => { // 登录页
 		timeLog('[Event:user.login][User:'+_ref.userName+']');
+		var chunks = []; 
 		var options = {
 			hostname: "www.zecaifu.com",
 			port: 443,
@@ -79,8 +80,9 @@ var CFRobot = function(user){
 			}
 		};
 		var req = Https.request(options, (res) => {
-			res.on('data', function(chunk) {
-				var body = chunkToStr(chunk, res.headers['content-encoding']);
+			res.on('data', (chunk) => { chunks.push(chunk); });
+			res.on('end', () => {
+				var body = chunkToStr(Buffer.concat(chunks), res.headers['content-encoding']);
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				var match = body.match(/_token" value="[^"]+/);
 				_ref.events.emit('user.login.submit', match[0].replace('_token" value="', ''));
@@ -92,6 +94,7 @@ var CFRobot = function(user){
 	this.events.on('user.login.submit', function(token) { // 登录页
 		timeLog('[Event:user.login.submit][User:'+_ref.userName+']');
 		var cookiePath = 'cookies/www.zecaifu.com-' + _ref.userName;
+		var chunks = [];
 		if (Fs.existsSync(cookiePath)) {
 			_ref.cookies = JSON.parse(Fs.readFileSync(cookiePath, 'utf8'));
 			_ref.auth = 1;
@@ -124,8 +127,9 @@ var CFRobot = function(user){
 			}
 		};
 		var req = Https.request(options, (res) => {
-			res.on('data', function(chunk) {
-				var body = chunkToStr(chunk, res.headers['content-encoding']);
+			res.on('data', (chunk) => { chunks.push(chunk); });
+			res.on('end', () => {
+				var body = chunkToStr(Buffer.concat(chunks), res.headers['content-encoding']);
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				_ref.auth = 1;
 				Fs.writeFileSync(cookiePath, JSON.stringify(_ref.cookies));
@@ -139,6 +143,7 @@ var CFRobot = function(user){
 
 	this.events.on('user.profile', ()=>{ // 获取余额
 		timeLog('[Event:user.profile][User:'+_ref.userName+']');
+		var chunks = [];
 		var options = {
 			hostname: "www.zecaifu.com",
 			port: 443,
@@ -157,8 +162,9 @@ var CFRobot = function(user){
 			}
 		};
 		var req = Https.request(options, (res) => {
-			res.on('data', function(chunk) {
-				var body = chunkToStr(chunk, res.headers['content-encoding']);
+			res.on('data', (chunk) => { chunks.push(chunk); });
+			res.on('end', () => {
+				var body = chunkToStr(Buffer.concat(chunks), res.headers['content-encoding']);
 				_ref.profile = JSON.parse(body);
 				timeLog('[Event:user.profile][User:'+_ref.userName+']Get balance=' + _ref.profile[0]);
 			});
@@ -169,6 +175,7 @@ var CFRobot = function(user){
 
 	this.events.on('car.detail', (car) => { // 登录页
 		timeLog('[Event:car.detail][User:'+_ref.userName+'][Car:' + car.borrowName + ']');
+		var _chunks = [];
 		var investment = _ref.profile[0].replace(',', '');
 		if (investment < 100) {
 			timeLog('[Event:car.detail][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, message=余额不足');
@@ -201,8 +208,9 @@ var CFRobot = function(user){
 			}
 		};
 		var req = Https.request(options, (res) => {
-			res.on('data', function(chunk) {
-				var body = chunkToStr(chunk, res.headers['content-encoding']);
+			res.on('data', (chunk) => { _chunks.push(chunk); });
+			res.on('end', () => {
+				var body = chunkToStr(Buffer.concat(_chunks), res.headers['content-encoding']);
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				var match = body.match(/_token" value="[^"]+/g);
 				token = match[0].replace('_token" value="', '')
@@ -217,6 +225,7 @@ var CFRobot = function(user){
 
 	this.events.on('pay.url', (car, token, num)=>{ // 提交众筹
 		timeLog('[Event:pay.url][User:'+_ref.userName+'][Car:' + car.borrowName + ']');
+		var _chunks = [];
 		if (_dispatched > 0) {
 			timeLog('[Event:pay.url][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, robot dispatched, user=' + _ref.userName);
 			return;
@@ -248,8 +257,9 @@ var CFRobot = function(user){
 			}
 		};
 		var req = Https.request(options, (res) => {
-			res.on('data', function(chunk) {
-				var body = chunkToStr(chunk, res.headers['content-encoding']);
+			res.on('data', (chunk) => { _chunks.push(chunk); });
+			res.on('end', () => {
+				var body = chunkToStr(Buffer.concat(_chunks), res.headers['content-encoding']);
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				body = JSON.parse(body);
 				if (body.status != 2) {
@@ -266,6 +276,7 @@ var CFRobot = function(user){
 
 	this.events.on('pay.redirect', (car, url)=>{ // 众筹中转页
 		timeLog('[Event:pay.redirect][User:'+_ref.userName+'][Car:' + car.borrowName + ']');
+		var _chunks = [];
 		var urlParam = Url.parse(url)
 		var options = {
 			hostname: urlParam.hostname,
@@ -285,8 +296,9 @@ var CFRobot = function(user){
 			}
 		};
 		var req = Https.request(options, (res) => {
-			res.on('data', function(chunk) {
-				var body = chunkToStr(chunk, res.headers['content-encoding']);
+			res.on('data', (chunk) => { _chunks.push(chunk); });
+			res.on('end', () => {
+				var body = chunkToStr(Buffer.concat(_chunks), res.headers['content-encoding']);
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				var formArray = body.match(/<input [^>]+>/g);
 				var formObj = [];
@@ -306,6 +318,7 @@ var CFRobot = function(user){
 
 	this.events.on('pay.detail', (car, url, formData) => { // 支付详情
 		timeLog('[Event:pay.detail][User:'+_ref.userName+'][Car:' + car.borrowName + ']');
+		var _chunks = [];
 		var options = {
 			hostname: 'transfer.moneymoremore.com',
 			port: 443,
@@ -322,12 +335,14 @@ var CFRobot = function(user){
 				'Referer': url,
 				'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8',
 				'Origin' : 'https://www.zecaifu.com',
+				'Content-Length': Buffer.byteLength(formData),
 				'Cache-Control' : 'max-age=0'
 			}
 		};
 		var req = Https.request(options, (res) => {
-			res.on('data', function(chunk) {
-				var body = chunkToStr(chunk, res.headers['content-encoding']);
+			res.on('data', (chunk) => { _chunks.push(chunk); });
+			res.on('end', () => {
+				var body = chunkToStr(Buffer.concat(_chunks), res.headers['content-encoding']);
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				var message = body.match(/name="Message" value="([^"]+)"/);
 				if (message) {
@@ -345,6 +360,7 @@ var CFRobot = function(user){
 
 	this.events.on('pay.verify', (car, detail)=>{ // 密码验证
 		timeLog('[Event:pay.verify][User:'+_ref.userName+'][Car:' + car.borrowName + ']');
+		var _chunks = [];
 		var postData = Query.stringify({
 			'LoanMoneymoremore' : detail.match(/mid:([0-9]+)/)[1],
 			'verifycode' : _ref.payPass,
@@ -372,8 +388,9 @@ var CFRobot = function(user){
 			}
 		};
 		var req = Https.request(options, (res) => {
-			res.on('data', function(chunk) {
-				var body = chunkToStr(chunk, res.headers['content-encoding']);
+			res.on('data', (chunk) => { _chunks.push(chunk); });
+			res.on('end', () => {
+				var body = chunkToStr(Buffer.concat(_chunks), res.headers['content-encoding']);
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				var message = body.match(/name="Message" value="([^"]+)"/);
 				if (message) {
@@ -394,6 +411,7 @@ var CFRobot = function(user){
 
 	this.events.on('pay.sign', (car, detail)=>{ // 支付签名
 		timeLog('[Event:pay.sign][User:'+_ref.userName+'][Car:' + car.borrowName + ']');
+		var _chunks = [];
 		var start = detail.search('<form id="myForm"');
 		var end = detail.search("/form>");
 		var formStr = detail.substring(start, end + "/form>".length);
@@ -431,8 +449,9 @@ var CFRobot = function(user){
 			}
 		};
 		var req = Https.request(options, (res) => {
-			res.on('data', function(chunk) {
-				var body = chunkToStr(chunk, res.headers['content-encoding']);
+			res.on('data', (chunk) => { _chunks.push(chunk); });
+			res.on('end', () => {
+				var body = chunkToStr(Buffer.concat(_chunks), res.headers['content-encoding']);
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				var message = body.match(/name="Message" value="([^"]+)"/);
 				if (message) {
@@ -451,6 +470,7 @@ var CFRobot = function(user){
 
 	this.events.on('pay.submit', (car, formObj) => { // 支付提交
 		timeLog('[Event:pay.submit][User:'+_ref.userName+'][Car:' + car.borrowName + ']');
+		var _chunks = [];
 		var postData = Query.stringify(formObj);
 		var options = {
 			hostname: 'transfer.moneymoremore.com',
@@ -473,8 +493,9 @@ var CFRobot = function(user){
 			}
 		};
 		var req = Https.request(options, (res) => {
-			res.on('data', function(chunk) {
-				var body = chunkToStr(chunk, res.headers['content-encoding']);
+			res.on('data', (chunk) => { _chunks.push(chunk); });
+			res.on('end', () => {
+				var body = chunkToStr(Buffer.concat(_chunks), res.headers['content-encoding']);
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				var message = body.match(/name="Message" value="([^"]+)"/);
 				if (message[1] != "成功") {
@@ -492,6 +513,7 @@ var CFRobot = function(user){
 
 	this.events.on('pay.callback', (car, detail)=>{ // 支付回调
 		timeLog('[Event:pay.callback][User:'+_ref.userName+'][Car:' + car.borrowName + ']');
+		var _chunks = [];
 		var start = detail.search('<form id="form1"');
 		var end = detail.search("/form>");
 		var formStr = detail.substring(start, end + "/form>".length);
@@ -526,8 +548,9 @@ var CFRobot = function(user){
 			}
 		};
 		var req = Https.request(options, (res) => {
-			res.on('data', function(chunk) {
-				var body = chunkToStr(chunk, res.headers['content-encoding']);
+			res.on('data', (chunk) => { _chunks.push(chunk); });
+			res.on('end', () => {
+				var body = chunkToStr(Buffer.concat(_chunks), res.headers['content-encoding']);
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				timeLog('[Event:pay.callback][User:'+_ref.userName+'][Car:' + car.borrowName + ']Done, return url=' + res.headers['location']);
 				_ref.events.emit('pay.return', car, res.headers['location']);
@@ -539,6 +562,7 @@ var CFRobot = function(user){
 
 	this.events.on('pay.return', (car, url) => { // 返回页
 		timeLog('[Event:pay.return][User:'+_ref.userName+'][Car:' + car.borrowName + ']');
+		var _chunks = [];
 		var urlParam = Url.parse(url)
 		var options = {
 			hostname: urlParam.hostname,
@@ -558,8 +582,9 @@ var CFRobot = function(user){
 			}
 		};
 		var req = Https.request(options, (res) => {
-			res.on('data', function(chunk) {
-				var body = chunkToStr(chunk, res.headers['content-encoding']);
+			res.on('data', (chunk) => { _chunks.push(chunk); });
+			res.on('end', () => {
+				var body = chunkToStr(Buffer.concat(_chunks), res.headers['content-encoding']);
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				timeLog('[Event:pay.return][User:'+_ref.userName+'][Car:' + car.borrowName + ']Done, status=' + res.statusCode);
 			});
@@ -572,12 +597,13 @@ var Detector = function() {
 	var _ref = this;
 	var _dispatched = [];
 	var _waitElapse = 100;
+	var _chunks = []
 
 	this.on('car.list', () => { // 标的列表
 		var options = {
 			hostname: "api.zecaifu.com",
 			port: 443,
-			path: "/api/v2/list/car/all/all?page=1",
+			path: '/api/v2/list/car/all/all?page=1&app_token=03b22a29e10a9fe2fc3cf72ba7e07688&_=' + Math.random(),
 			method: "GET",
 			headers: {
 				'Host': 'api.zecaifu.com',
@@ -586,8 +612,9 @@ var Detector = function() {
 			}
 		};
 		var req = Https.request(options, (res) => {
-			res.on('data', function(chunk) {
-				var body = chunkToStr(chunk, res.headers['content-encoding']);
+			res.on('data', (chunk) => { _chunks.push(chunk); });
+			res.on('end', () => {
+				var body = chunkToStr(Buffer.concat(_chunks), res.headers['content-encoding']);
 				try {
 					body = JSON.parse(body);
 				} catch (err) {
