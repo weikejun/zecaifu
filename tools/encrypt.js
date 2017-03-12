@@ -4704,6 +4704,7 @@ JSEncrypt.prototype.getPublicKeyB64 = function () {
   exports.JSEncrypt = JSEncrypt;
 });
 
+/*
 if (process.argv.length != 4) {
 	console.log('Usage: node encrypt.js [PUBKEY] [PAY_PASS]');
 } else {
@@ -4712,3 +4713,4 @@ if (process.argv.length != 4) {
 	encrypt.setPublicKey(publicKey);
 	console.log(encrypt.encrypt(process.argv[3]));
 }
+*/

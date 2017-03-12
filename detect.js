@@ -6,6 +6,7 @@ const Events = require('events');
 const Query = require('querystring');
 const Util = require('util');
 const Url = require('url');
+const Encrypt = require('./tools/encrypt.js');
 
 // 通用函数
 var chunkToStr = function(chunk, enc) {
@@ -85,6 +86,11 @@ var CFRobot = function(user){
 				var body = chunkToStr(Buffer.concat(chunks), res.headers['content-encoding']);
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				var match = body.match(/_token" value="[^"]+/);
+				if (!match) {
+					timeLog('[Event:user.login][User:'+_ref.userName+']Exit, message=登录错误');
+					Fs.writeFileSync('http/user.login-' + _ref.userName, body);
+					return;
+				}
 				_ref.events.emit('user.login.submit', match[0].replace('_token" value="', ''));
 			});
 		});
@@ -175,6 +181,10 @@ var CFRobot = function(user){
 
 	this.events.on('car.detail', (car) => { // 登录页
 		timeLog('[Event:car.detail][User:'+_ref.userName+'][Car:' + car.borrowName + ']');
+		if (_ref.profile.length < 1) {
+			timeLog('[Event:car.detail][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, message=余额未正常取回, auth=' + _ref.auth);
+			return;
+		}
 		var _chunks = [];
 		var investment = _ref.profile[0].replace(',', '');
 		if (investment < 100) {
@@ -184,7 +194,7 @@ var CFRobot = function(user){
 		if (_ref.strategys) {
 			var no = car.borrowName.match(/第([0-9]+)/);
 			if (!(investment = _ref.strategys[no[1]])) {
-				timeLog('[Event:car.detail][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, message=');
+				timeLog('[Event:car.detail][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, message=未命中策略');
 				return;
 			}
 		}
@@ -218,6 +228,7 @@ var CFRobot = function(user){
 				investNum = (investNum > car.borrowMax ? car.borrowMax : investNum);
 				timeLog('[Event:car.detail][User:'+_ref.userName+'][Car:' + car.borrowName + ']Get pay token=' + token + ', num=' + investNum);
 				_ref.events.emit('pay.url', car, token, investNum);
+				Fs.writeFileSync('http/car.detail-' + _ref.userName + '-' + car.sid, body);
 			});
 		});
 		req.end();
@@ -268,6 +279,7 @@ var CFRobot = function(user){
 				}
 				timeLog('[Event:pay.url][User:'+_ref.userName+'][Car:' + car.borrowName + ']Pay start, url=' + body.msg);
 				_ref.events.emit('pay.redirect', car, body.msg);
+				Fs.writeFileSync('http/pay.url-' + _ref.userName + '-' + car.sid, JSON.stringify(body));
 			});
 		});
 		req.write(postData);
@@ -311,6 +323,7 @@ var CFRobot = function(user){
 				var formData = Query.stringify(formObj);
 				timeLog('[Event:pay.redirect][User:'+_ref.userName+'][Car:' + car.borrowName + ']Redirect form=' + formData);
 				_ref.events.emit('pay.detail', car, url, formData);
+				Fs.writeFileSync('http/pay.redirect-' + _ref.userName + '-' + car.sid, body);
 			});
 		});
 		req.end();
@@ -351,6 +364,7 @@ var CFRobot = function(user){
 				}
 				timeLog('[Event:pay.detail][User:'+_ref.userName+'][Car:' + car.borrowName + ']Success, detail page size=' + body.length);
 				_ref.events.emit('pay.verify', car, body);
+				Fs.writeFileSync('http/pay.detail-' + _ref.userName + '-' + car.sid, body);
 			});
 		});
 
@@ -361,10 +375,25 @@ var CFRobot = function(user){
 	this.events.on('pay.verify', (car, detail)=>{ // 密码验证
 		timeLog('[Event:pay.verify][User:'+_ref.userName+'][Car:' + car.borrowName + ']');
 		var _chunks = [];
+		var matches = detail.match(/publicKey = "([^"]+)"/);
+		if (!matches) {
+			timeLog(
+				'[Event:pay.verify][User:'
+				+ _ref.userName
+				+ '][Car:' 
+				+ car.borrowName 
+				+ ']Exit, publickKey not found'
+			);
+			return;
+		}
+		var encrypt = new Encrypt.JSEncrypt();
+		encrypt.setPublicKey(matches[1]);
+		var verifyCode = encrypt.encrypt(_ref.payPass);
 		var postData = Query.stringify({
 			'LoanMoneymoremore' : detail.match(/mid:([0-9]+)/)[1],
-			'verifycode' : _ref.payPass,
-			'verifytype' : 2
+			'verifycode' : verifyCode,
+			'verifytype' : 2,
+			'isEncrypt' : 1
 		});
 		var options = {
 			hostname: 'transfer.moneymoremore.com',
@@ -401,7 +430,8 @@ var CFRobot = function(user){
 					timeLog('[Event:pay.verify][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, message=支付密码验证失败, ret=' + body);
 					return;
 				}
-				_ref.events.emit('pay.sign', car, detail);
+				_ref.events.emit('pay.sign', car, detail, verifyCode);
+				Fs.writeFileSync('http/pay.verify-' + _ref.userName + '-' + car.sid, body);
 			});
 		});
 
@@ -409,7 +439,7 @@ var CFRobot = function(user){
 		req.end();
 	});
 
-	this.events.on('pay.sign', (car, detail)=>{ // 支付签名
+	this.events.on('pay.sign', (car, detail, verifyCode) => { // 支付签名
 		timeLog('[Event:pay.sign][User:'+_ref.userName+'][Car:' + car.borrowName + ']');
 		var _chunks = [];
 		var start = detail.search('<form id="myForm"');
@@ -425,7 +455,7 @@ var CFRobot = function(user){
 			}
 			formObj[inputName[1]] = inputVal[1];
 		}
-		formObj['payPassword'] = _ref.payPass;
+		formObj['payPassword'] = verifyCode;
 		var postData = Query.stringify({
 			'data' : Query.stringify(formObj)
 		});
@@ -461,6 +491,7 @@ var CFRobot = function(user){
 				formObj['itrusdata'] = body;
 				timeLog('[Event:pay.sign][User:'+_ref.userName+'][Car:' + car.borrowName + ']Done, itrusdata=' + body);
 				_ref.events.emit('pay.submit', car, formObj);
+				Fs.writeFileSync('http/pay.sign-' + _ref.userName + '-' + car.sid, body);
 			});
 		});
 
@@ -489,21 +520,31 @@ var CFRobot = function(user){
 				'Origin' : 'https://transfer.moneymoremore.com',
 				'Upgrade-Insecure-Requests' : '1',
 				'Cache-Control' : 'max-age=0',
+				'Content-Length' : Buffer.byteLength(postData),
 				'Cookie' : _ref.cookies['transfer.moneymoremore.com']
 			}
 		};
+		console.dir(formObj);
+		console.dir(postData);
 		var req = Https.request(options, (res) => {
 			res.on('data', (chunk) => { _chunks.push(chunk); });
 			res.on('end', () => {
 				var body = chunkToStr(Buffer.concat(_chunks), res.headers['content-encoding']);
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
-				var message = body.match(/name="Message" value="([^"]+)"/);
+				var message = body.match(/name="Message" value="([^"]*)"/);
+				if (!message) {
+					timeLog('[Event:pay.submit][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, pay error message=未知错误');
+					Fs.writeFileSync('http/pay.submit-' + _ref.userName, body);
+					return;
+				}
 				if (message[1] != "成功") {
 					timeLog('[Event:pay.submit][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, pay error message=' + message[1]);
-					return
+					Fs.writeFileSync('http/pay.submit-' + _ref.userName, body);
+					return;
 				}
 				timeLog('[Event:pay.submit][User:'+_ref.userName+'][Car:' + car.borrowName + ']Done, message=' + message[1]);
 				_ref.events.emit('pay.callback', car, body);
+				Fs.writeFileSync('http/pay.submit-' + _ref.userName + '-' + car.sid, body);
 			});
 		});
 
@@ -554,6 +595,7 @@ var CFRobot = function(user){
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				timeLog('[Event:pay.callback][User:'+_ref.userName+'][Car:' + car.borrowName + ']Done, return url=' + res.headers['location']);
 				_ref.events.emit('pay.return', car, res.headers['location']);
+				Fs.writeFileSync('http/pay.callback-' + _ref.userName + '-' + car.sid, body);
 			});
 		});
 		req.write(postData);
@@ -587,63 +629,12 @@ var CFRobot = function(user){
 				var body = chunkToStr(Buffer.concat(_chunks), res.headers['content-encoding']);
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				timeLog('[Event:pay.return][User:'+_ref.userName+'][Car:' + car.borrowName + ']Done, status=' + res.statusCode);
+				Fs.writeFileSync('http/pay.return-' + _ref.userName + '-' + car.sid, body);
 			});
 		});
 		req.end();
 	});
 };
-
-var Detector = function() {
-	var _ref = this;
-	var _dispatched = [];
-	var _waitElapse = 100;
-	var _chunks = []
-
-	this.on('car.list', () => { // 标的列表
-		var options = {
-			hostname: "api.zecaifu.com",
-			port: 443,
-			path: '/api/v2/list/car/all/all?page=1&app_token=03b22a29e10a9fe2fc3cf72ba7e07688&_=' + Math.random(),
-			method: "GET",
-			headers: {
-				'Host': 'api.zecaifu.com',
-				'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 7.0; VIE-AL10 Build/HUAWEIVIE-AL10)',
-				'Accept-Encoding': 'gzip'
-			}
-		};
-		var req = Https.request(options, (res) => {
-			res.on('data', (chunk) => { _chunks.push(chunk); });
-			res.on('end', () => {
-				var body = chunkToStr(Buffer.concat(_chunks), res.headers['content-encoding']);
-				try {
-					body = JSON.parse(body);
-				} catch (err) {
-					timeLog('[Event:car.list]Get car list error, retry');
-					body = {code: -1};
-				}
-				if (body.code == 0 && body.data.borrow.totalItems > 0) { // 成功
-					var list = body.data.borrow.borrowList;
-					for (i = 0; i < list.length; i++) {
-						if(list[i].status != 'run' 
-								|| _dispatched[list[i].sid]) // 车辆状态未就绪或者已分配
-							continue;
-						for(n = 0; n < robots.length; n++) {
-							robots[n].events.emit('car.detail', list[i]);
-						}
-						_dispatched[list[i].sid] = 1;
-						_waitElapse = 1;
-					}
-				}
-				setTimeout(function() {
-					_ref.emit('car.list');
-				}, _waitElapse);
-			});
-		});
-		req.end();
-	});
-};
-
-Detector.prototype = new Events;
 
 // 配置文件加载
 // config/strategy.dat
@@ -683,8 +674,52 @@ for(i in userList) {
 }
 
 timeLog('[Process]Create detector');
-setTimeout(function() {
-	var detector = new Detector();
-	detector.emit('car.list');
-}, 3000);
+var detectDispatched = { length: 0 };
+var listenTimer = setInterval(function() { // 创建监听器
+	var _chunks = [];
+	var options = {
+		hostname: "api.zecaifu.com",
+		port: 443,
+		path: '/api/v2/list/car/all/all?page=1&app_token=03b22a29e10a9fe2fc3cf72ba7e07688&',
+		method: "GET",
+		headers: {
+			'Host': 'api.zecaifu.com',
+			'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 7.0; VIE-AL10 Build/HUAWEIVIE-AL10)',
+			'Connection': 'Keep-Alive',
+			'Accept-Encoding': 'gzip'
+		}
+	};
+	var req = Https.request(options, (res) => {
+		res.on('data', (chunk) => { _chunks.push(chunk); });
+		res.on('end', () => {
+			var body = chunkToStr(Buffer.concat(_chunks), res.headers['content-encoding']);
+			try {
+				body = JSON.parse(body);
+				timeLog('[Detector:listen]Get car list, code=' + body.code);
+			} catch (err) {
+				timeLog('[Detector:listen]Get car list error, retry');
+				body = {code: -1};
+			}
+			if (body.code == 0 && body.data.borrow.totalItems > 0) { // 成功
+				var list = body.data.borrow.borrowList;
+				for (i = 0; i < list.length; i++) {
+					if(list[i].status != 'run' 
+							|| detectDispatched[list[i].sid]) // 车辆状态未就绪或者已分配
+						continue;
+					for(n = 0; n < robots.length; n++) {
+						robots[n].events.emit('car.detail', list[i]);
+					}
+					detectDispatched[list[i].sid] = 1;
+					detectDispatched['length']++;
+				}
+			}
+			if (detectDispatched.length >= 4) {
+				clearInterval(listenTimer);
+				timeLog('[Detector:listen]Dispatched done, total=' + detectDispatched.length);
+				return;
+			}
+		});
+	});
+	req.end();
+}, 800);
 
