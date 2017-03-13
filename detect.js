@@ -524,8 +524,6 @@ var CFRobot = function(user){
 				'Cookie' : _ref.cookies['transfer.moneymoremore.com']
 			}
 		};
-		console.dir(formObj);
-		console.dir(postData);
 		var req = Https.request(options, (res) => {
 			res.on('data', (chunk) => { _chunks.push(chunk); });
 			res.on('end', () => {
@@ -721,5 +719,5 @@ var listenTimer = setInterval(function() { // 创建监听器
 		});
 	});
 	req.end();
-}, 800);
+}, 600);
 

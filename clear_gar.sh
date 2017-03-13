@@ -31,10 +31,10 @@ for dir in $(echo "http log");do
 done
 
 doLog "Clear process start"
-for p in $(ps -ef|egrep "process_bid|create_listener|create_detector"|grep -v "grep"|grep -v "vim"|awk '{print $2}');do
+for p in $(ps -ef|egrep "detect.js"|grep -v "grep"|grep -v "vim"|awk '{print $2}');do
 	STARTED=$(date -d "$(ps -p $p -o lstart|grep -v -i STARTED)" +%s)
 	ELAPSED=$(($(date +%s) - $STARTED))
-	if [ $ELAPSED -gt 180 ];then
+	if [ $ELAPSED -gt 240 ];then
 		CMD="kill $p"
 		echo $CMD
 		eval $CMD
