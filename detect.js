@@ -693,7 +693,9 @@ var listenTimer = setInterval(function() { // 创建监听器
 			var body = chunkToStr(Buffer.concat(_chunks), res.headers['content-encoding']);
 			try {
 				body = JSON.parse(body);
-				timeLog('[Detector:listen]Get car list, code=' + body.code);
+				if (body.code != 0) {
+					timeLog('[Detector:listen]Get car list, code=' + body.code + ', data=' + JSON.stringify(body));
+				}
 			} catch (err) {
 				timeLog('[Detector:listen]Get car list error, retry');
 				body = {code: -1};
