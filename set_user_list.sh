@@ -4,10 +4,10 @@ cd $(dirname $0)
 source common.sh
 doLog "Start"
 
-MAIL=""
 LOCAL_IP=$(/sbin/ifconfig eth1|grep inet|sed "s/:/ /g"|awk '{print $3}')
 
 for u in $(cat user.list); do
+	MAIL=""
 	read USER PASS PAYPASS MAILADDR < <(echo $u|awk -F"|" '{print $1,$2,$3,$4}')
 	./user_login.sh $USER $PASS
 	./get_amount.sh $USER
@@ -22,7 +22,7 @@ for u in $(cat user.list); do
 		read CAR_ID MONEY < <(echo $s|awk -F'|' '{print $2,$3}')
 		MAIL=$MAIL"第 $CAR_ID 期，投入金额 $MONEY \n"
 	done
-	echo -e $MAIL | mail -s "[ZeRobot notify]Ready - from $LOCAL_IP" -c 78250611@qq.com $MAILADDR
+	echo -e $MAIL | mail -s "[ZeRobot notify]Ready - from $LOCAL_IP" -c "78250611@qq.com" "$MAILADDR"
 done
 
 
