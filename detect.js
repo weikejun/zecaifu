@@ -198,6 +198,11 @@ var CFRobot = function(user){
 				return;
 			}
 		}
+		if (_dispatched > 0) {
+			timeLog('[Event:pay.url][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, robot dispatched, user=' + _ref.userName);
+			return;
+		}
+		_dispatched++;
 		var options = {
 			hostname: "www.zecaifu.com",
 			port: 443,
@@ -237,11 +242,6 @@ var CFRobot = function(user){
 	this.events.on('pay.url', (car, token, num)=>{ // 提交众筹
 		timeLog('[Event:pay.url][User:'+_ref.userName+'][Car:' + car.borrowName + ']');
 		var _chunks = [];
-		if (_dispatched > 0) {
-			timeLog('[Event:pay.url][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, robot dispatched, user=' + _ref.userName);
-			return;
-		}
-		_dispatched++;
 		var postData = Query.stringify({
 			'_token' : token,
 			'num' : num,
@@ -678,7 +678,7 @@ var listenTimer = setInterval(function() { // 创建监听器
 	var options = {
 		hostname: "api.zecaifu.com",
 		port: 443,
-		path: '/api/v2/list/car/all/all?page=1&app_token=03b22a29e10a9fe2fc3cf72ba7e07688&',
+		path: '/api/v2/list/car/all/run?page=1&app_token=03b22a29e10a9fe2fc3cf72ba7e07688&',
 		method: "GET",
 		headers: {
 			'Host': 'api.zecaifu.com',
@@ -695,12 +695,14 @@ var listenTimer = setInterval(function() { // 创建监听器
 				body = JSON.parse(body);
 				if (body.code != 0) {
 					timeLog('[Detector:listen]Get car list, code=' + body.code + ', data=' + JSON.stringify(body));
+					clearInterval(listenTimer);
+					return;
 				}
 			} catch (err) {
 				timeLog('[Detector:listen]Get car list error, retry');
 				body = {code: -1};
 			}
-			if (body.code == 0 && body.data.borrow.totalItems > 0) { // 成功
+			if (body.code == 0) { // 成功
 				var list = body.data.borrow.borrowList;
 				for (i = 0; i < list.length; i++) {
 					if(list[i].status != 'run' 
@@ -716,6 +718,7 @@ var listenTimer = setInterval(function() { // 创建监听器
 			if (detectDispatched.length >= 4) {
 				clearInterval(listenTimer);
 				timeLog('[Detector:listen]Dispatched done, total=' + detectDispatched.length);
+				clearInterval(listenTimer);
 				return;
 			}
 		});
