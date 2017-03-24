@@ -230,7 +230,9 @@ var CFRobot = function(user){
 				var match = body.match(/_token" value="[^"]+/g);
 				token = match[0].replace('_token" value="', '')
 				var investNum = Math.floor(investment / 100);
-				investNum = (investNum > car.borrowMax ? car.borrowMax : investNum);
+				if (car.borrowMax) {
+					investNum = (investNum > car.borrowMax ? car.borrowMax : investNum);
+				}
 				timeLog('[Event:car.detail][User:'+_ref.userName+'][Car:' + car.borrowName + ']Get pay token=' + token + ', num=' + investNum);
 				_ref.events.emit('pay.url', car, token, investNum);
 				Fs.writeFileSync('http/car.detail-' + _ref.userName + '-' + car.sid, body);
@@ -321,7 +323,7 @@ var CFRobot = function(user){
 					formObj[arr[1]] = arr[2];
 				}
 				var formData = Query.stringify(formObj);
-				timeLog('[Event:pay.redirect][User:'+_ref.userName+'][Car:' + car.borrowName + ']Redirect form=' + formData);
+				timeLog('[Event:pay.redirect][User:'+_ref.userName+'][Car:' + car.borrowName + ']Redirect form size=' + formData.length);
 				_ref.events.emit('pay.detail', car, url, formData);
 				Fs.writeFileSync('http/pay.redirect-' + _ref.userName + '-' + car.sid, body);
 			});
@@ -489,7 +491,7 @@ var CFRobot = function(user){
 					return;
 				}
 				formObj['itrusdata'] = body;
-				timeLog('[Event:pay.sign][User:'+_ref.userName+'][Car:' + car.borrowName + ']Done, itrusdata=' + body);
+				timeLog('[Event:pay.sign][User:'+_ref.userName+'][Car:' + car.borrowName + ']Done, itrusdata size=' + body.length);
 				_ref.events.emit('pay.submit', car, formObj);
 				Fs.writeFileSync('http/pay.sign-' + _ref.userName + '-' + car.sid, body);
 			});
