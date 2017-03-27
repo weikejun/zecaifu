@@ -362,6 +362,7 @@ var CFRobot = function(user){
 				var message = body.match(/name="Message" value="([^"]+)"/);
 				if (message) {
 					timeLog('[Event:pay.detail][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, message=' + message[1]);
+					_dispatched--;
 					return;
 				}
 				timeLog('[Event:pay.detail][User:'+_ref.userName+'][Car:' + car.borrowName + ']Success, detail page size=' + body.length);

@@ -23,6 +23,7 @@ for u in $(cat user.list); do
 		MAIL=$MAIL"第 $CAR_ID 期，投入金额 $MONEY \n"
 	done
 	echo -e $MAIL | mail -s "[ZeRobot notify]Ready - from $LOCAL_IP" -c "78250611@qq.com" "$MAILADDR"
+	sleep 2
 done
 
 
