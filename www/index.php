@@ -33,7 +33,7 @@
   <div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
     <h3>导航</h3>
     <hr>
-    <div>101.200.125.62: <a href="http://101.200.125.62/actLog.php">操作日志</a> | <a href="http://101.200.125.62/user.php">账户设置</a> | <a href="http://101.200.125.62/strategy.php">策略设置</a></div>
+    <div><a href="actLog.php">操作日志</a> | <a href="user.php">账户设置</a> | <a href="strategy.php">策略设置</a></div>
     <hr>
     <p>© 2016 Jimwei </p>
   </div>
