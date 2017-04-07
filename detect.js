@@ -230,7 +230,7 @@ var CFRobot = function(user){
 				var match = body.match(/_token" value="[^"]+/g);
 				token = match[0].replace('_token" value="', '')
 				var investNum = Math.floor(investment / 100);
-				if (car.borrowMax) {
+				if (car.borrowMax > 1) {
 					investNum = (investNum > car.borrowMax ? car.borrowMax : investNum);
 				}
 				timeLog('[Event:car.detail][User:'+_ref.userName+'][Car:' + car.borrowName + ']Get pay token=' + token + ', num=' + investNum);
@@ -676,7 +676,15 @@ for(i in userList) {
 
 timeLog('[Process]Create detector');
 var detectDispatched = { length: 0 };
-var listenTimer = setInterval(function() { // 创建监听器
+(doDetect = function() { // 创建监听器
+	var _ts = new Date();
+	var _waitElapse = 10;
+	if (_ts.getSeconds() % 5 != 0) {
+		setTimeout(function() {
+			doDetect();
+		}, _waitElapse);
+		return;
+	}
 	var _chunks = [];
 	var options = {
 		hostname: "api.zecaifu.com",
@@ -716,16 +724,18 @@ var listenTimer = setInterval(function() { // 创建监听器
 					}
 					detectDispatched[list[i].sid] = 1;
 					detectDispatched['length']++;
+					_waitElapse = 1000;
 				}
 			}
 			if (detectDispatched.length >= 4) {
-				clearInterval(listenTimer);
 				timeLog('[Detector:listen]Dispatched done, total=' + detectDispatched.length);
-				clearInterval(listenTimer);
 				return;
 			}
+			setTimeout(function() {
+				doDetect();
+			}, _waitElapse);
 		});
 	});
 	req.end();
-}, 800);
+})();
 
