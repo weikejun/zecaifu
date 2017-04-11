@@ -24,9 +24,9 @@ var chunkToStr = function(chunk, enc) {
 	return body;
 };
 
-var page = 1;
+var page = 200;
 var listenTimer = setInterval(function() { // 创建监听器
-	if (page == 16) {
+	if (page == 130) {
 		clearInterval(listenTimer);
 		return;
 	}
@@ -34,7 +34,7 @@ var listenTimer = setInterval(function() { // 创建监听器
 	var options = {
 		hostname: "api.zecaifu.com",
 		port: 443,
-		path: '/api/v2/list/house/all/all?page=' + page,
+		path: '/api/v2/list/car/all/all?page=' + page,
 		method: "GET",
 		headers: {
 			'Host': 'api.zecaifu.com',

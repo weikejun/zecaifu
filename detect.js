@@ -48,6 +48,9 @@ var CFRobot = function(user){
 	this.events = new Events;
 	var _ref = this;
 	var _dispatched = 0;
+	var _balance = 0;
+	var _detailSubmit = 0;
+	var _paySubmit = 0;
 
 	this.setCookie = function(cookies, hostname) {
 		this.cookies[hostname] = this.cookies[hostname] || '';
@@ -172,6 +175,7 @@ var CFRobot = function(user){
 			res.on('end', () => {
 				var body = chunkToStr(Buffer.concat(chunks), res.headers['content-encoding']);
 				_ref.profile = JSON.parse(body);
+				_balance = _ref.profile[0].replace(',', '');  
 				timeLog('[Event:user.profile][User:'+_ref.userName+']Get balance=' + _ref.profile[0]);
 			});
 		});
@@ -198,10 +202,12 @@ var CFRobot = function(user){
 				return;
 			}
 		}
+		/*
 		if (_dispatched > 0) {
 			timeLog('[Event:pay.url][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, robot dispatched, user=' + _ref.userName);
 			return;
 		}
+		*/
 		_dispatched++;
 		var options = {
 			hostname: "www.zecaifu.com",
@@ -232,6 +238,16 @@ var CFRobot = function(user){
 				var investNum = Math.floor(investment / 100);
 				if (car.borrowMax > 1) {
 					investNum = (investNum > car.borrowMax ? car.borrowMax : investNum);
+				}
+				if (_balance >= investNum * 100) {
+					_balance -= investNum * 100;
+				} else {
+					investNum = Math.floor(_balance / 100);
+					_balance = 0;
+				} 
+			       	if (investNum < 1) {
+					timeLog('[Event:car.detail][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, message=资金耗尽');
+					return;
 				}
 				timeLog('[Event:car.detail][User:'+_ref.userName+'][Car:' + car.borrowName + ']Get pay token=' + token + ', num=' + investNum);
 				_ref.events.emit('pay.url', car, token, investNum);
@@ -357,12 +373,16 @@ var CFRobot = function(user){
 		var req = Https.request(options, (res) => {
 			res.on('data', (chunk) => { _chunks.push(chunk); });
 			res.on('end', () => {
+				_detailSubmit--;
 				var body = chunkToStr(Buffer.concat(_chunks), res.headers['content-encoding']);
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				var message = body.match(/name="Message" value="([^"]+)"/);
 				if (message) {
 					timeLog('[Event:pay.detail][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, message=' + message[1]);
 					_dispatched--;
+					if(message[1] == "转账失败") {
+						_ref.events.emit('pay.detail', car, url, formData);
+					}
 					return;
 				}
 				timeLog('[Event:pay.detail][User:'+_ref.userName+'][Car:' + car.borrowName + ']Success, detail page size=' + body.length);
@@ -372,7 +392,14 @@ var CFRobot = function(user){
 		});
 
 		req.write(formData);
-		req.end();
+		var subTimer = setInterval(function() {
+			if(_detailSubmit) {
+				return;
+			}
+			_detailSubmit++;
+			clearInterval(subTimer);
+			req.end();
+		}, 1);
 	});
 
 	this.events.on('pay.verify', (car, detail)=>{ // 密码验证
@@ -530,6 +557,7 @@ var CFRobot = function(user){
 		var req = Https.request(options, (res) => {
 			res.on('data', (chunk) => { _chunks.push(chunk); });
 			res.on('end', () => {
+				_paySubmit--;
 				var body = chunkToStr(Buffer.concat(_chunks), res.headers['content-encoding']);
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				var message = body.match(/name="Message" value="([^"]*)"/);
@@ -550,7 +578,17 @@ var CFRobot = function(user){
 		});
 
 		req.write(postData);
-		req.end();
+		var subTimer = setInterval(function() {
+			if(_paySubmit) {
+				return;
+			}
+			_paySubmit++;
+			clearInterval(subTimer);
+			req.end();
+			setTimeout(function() {
+				_paySubmit--;
+			}, 10000)
+		}, 1);
 	});
 
 	this.events.on('pay.callback', (car, detail)=>{ // 支付回调
