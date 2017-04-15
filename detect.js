@@ -239,12 +239,14 @@ var CFRobot = function(user){
 				if (car.borrowMax > 1) {
 					investNum = (investNum > car.borrowMax ? car.borrowMax : investNum);
 				}
+				/*
 				if (_balance >= investNum * 100) {
 					_balance -= investNum * 100;
 				} else {
 					investNum = Math.floor(_balance / 100);
 					_balance = 0;
 				} 
+				*/
 			       	if (investNum < 1) {
 					timeLog('[Event:car.detail][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, message=资金耗尽');
 					return;

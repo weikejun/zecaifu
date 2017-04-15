@@ -6,7 +6,9 @@ source common.sh
 # set dirs and files
 mkdir -p log amount http cookies  
 touch user.list
-chmod 777 log amount http cookies user.list
+touch config/strategys.dat
+chmod 777 log amount http cookiest
+chmod 666 user.list config/strategy.dat
 echo "13811311608|Wkj12345678|bababu523|78250611@qq.com" > user.list
 
 # set crontab
