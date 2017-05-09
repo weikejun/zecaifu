@@ -31,11 +31,11 @@
 </div>
 <div class="am-g">
   <div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
-    <h3>导航</h3>
+    <h3>导航 - <?php echo $_SERVER['SERVER_ADDR'] ?></h3>
     <hr>
     <div><a href="actLog.php">操作日志</a> | <a href="user.php">账户设置</a> | <a href="strategy.php">策略设置</a></div>
     <hr>
-    <p>© 2016 Jimwei </p>
+    <script>var dt=new Date();document.write('<p>© '+dt.getFullYear()+' Jimwei </p>');</script>
   </div>
 </div>
 </body>

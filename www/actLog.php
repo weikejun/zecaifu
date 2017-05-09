@@ -31,7 +31,7 @@
 </div>
 <div class="am-g">
   <div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
-    <h3>操作日志</h3>
+    <h3>操作日志 - <?php echo $_SERVER['SERVER_ADDR'] ?></h3>
     <hr>
 <?php
 $logDir = dirname(dirname(__FILE__))."/log";
@@ -47,7 +47,7 @@ foreach($lines as $line) {
 echo '</pre>';
 ?>
     <hr>
-    <p>© 2016 Jimwei </p>
+    <script>var dt=new Date();document.write('<p>© '+dt.getFullYear()+' Jimwei </p>');</script>
   </div>
 </div>
 </body>
