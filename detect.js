@@ -198,8 +198,10 @@ var CFRobot = function(user){
 		if (_ref.strategys) {
 			var no = car.borrowName.match(/第([0-9]+)/);
 			if (!(investment = _ref.strategys[no[1]])) {
-				timeLog('[Event:car.detail][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, message=未命中策略');
-				return;
+				if (!(investment = _ref.strategys['*'])) {
+					timeLog('[Event:car.detail][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, message=未命中策略');
+					return;
+				}
 			}
 		}
 		/*
@@ -571,6 +573,9 @@ var CFRobot = function(user){
 				if (message[1] != "成功") {
 					timeLog('[Event:pay.submit][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, pay error message=' + message[1]);
 					Fs.writeFileSync('http/pay.submit-' + _ref.userName, body);
+					if (message[1] == '转账信息已过期') {
+						_ref.events.emit('car.detail', car);
+					}
 					return;
 				}
 				timeLog('[Event:pay.submit][User:'+_ref.userName+'][Car:' + car.borrowName + ']Done, message=' + message[1]);
@@ -589,7 +594,7 @@ var CFRobot = function(user){
 			req.end();
 			setTimeout(function() {
 				_paySubmit--;
-			}, 10000)
+			}, 8000)
 		}, 1);
 	});
 
