@@ -7,6 +7,7 @@ const Query = require('querystring');
 const Util = require('util');
 const Url = require('url');
 const Encrypt = require('./tools/encrypt.js');
+var paySubmitWait = 8000;
 
 // 通用函数
 var chunkToStr = function(chunk, enc) {
@@ -594,7 +595,7 @@ var CFRobot = function(user){
 			req.end();
 			setTimeout(function() {
 				_paySubmit--;
-			}, 8000)
+			}, paySubmitWait)
 		}, 1);
 	});
 
@@ -705,6 +706,9 @@ var userList = Fs
 	.readFileSync(__dirname + '/user.list','utf8')
 	.replace(/(^\s+|\s+$)/g, '')
 	.split("\n");
+if (userList.length <= 1) {
+	paySubmitWait = 100;
+}
 for(i in userList) {
 	var user = userList[i].split('|');
 	var robot = new CFRobot({

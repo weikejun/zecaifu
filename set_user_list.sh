@@ -19,8 +19,12 @@ for u in $(cat user.list); do
 	fi
 
 	for s in $(cat config/strategy.dat|grep $USER|sed -r "s/\s+//g");do
-		read CAR_ID MONEY < <(echo $s|awk -F'|' '{print $2,$3}')
-		MAIL=$MAIL"第 $CAR_ID 期，投入金额 $MONEY \n"
+		read CAR_ID MONEY < <(echo $s|awk -F'|' '{print $2,$3}'|sed -r "s/\*/-/g")
+		if [ $CAR_ID == "-" ];then
+			MAIL=$MAIL"各标的等额投入 $MONEY \n"
+		else
+			MAIL=$MAIL"第 $CAR_ID 期，投入金额 $MONEY \n"
+		fi
 	done
 	echo -e $MAIL | mail -s "[ZeRobot notify]Ready - from $LOCAL_IP" -c "78250611@qq.com" "$MAILADDR"
 	sleep 2

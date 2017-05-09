@@ -10,7 +10,7 @@ if [ $# != 1 ];then
 fi
 
 USER=$1
-COOKIE_FILE="cookies/$(ls cookies/|grep $USER|tail -n 1)"
+COOKIE_FILE="cookies/$(ls cookies/|grep $USER"_"|tail -n 1)"
 
 if [ ! -f $COOKIE_FILE ];then
 	doLog "User $USER not login"
