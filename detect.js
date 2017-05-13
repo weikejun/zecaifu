@@ -568,12 +568,12 @@ var CFRobot = function(user){
 				var message = body.match(/name="Message" value="([^"]*)"/);
 				if (!message) {
 					timeLog('[Event:pay.submit][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, pay error message=未知错误');
-					Fs.writeFileSync('http/pay.submit-' + _ref.userName, body);
+					Fs.writeFileSync('http/pay.submit-' + _ref.userName + '-' + car.sid, body);
 					return;
 				}
 				if (message[1] != "成功") {
 					timeLog('[Event:pay.submit][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, pay error message=' + message[1]);
-					Fs.writeFileSync('http/pay.submit-' + _ref.userName, body);
+					Fs.writeFileSync('http/pay.submit-' + _ref.userName + '-' + car.sid, body);
 					if (message[1] == '转账信息已过期') {
 						_ref.events.emit('car.detail', car);
 					}
@@ -692,13 +692,21 @@ var strategyList = Fs
 	.replace(/(^\s+|\s+$)/g, '')
 	.split("\n");
 for(i in strategyList) {
-	var strategy = strategyList[i].split('|');
+	var strategy = strategyList[i].replace(/\s+/g, '').split('|');
 	if(!strategys[strategy[0]]) {
 		strategys[strategy[0]] = {};
 	}
-
-	strategys[strategy[0]][strategy[1]] = strategy[2];
+	
+	if(strategy[1].match(/,/)) {
+		strategy[1] = strategy[1].split(',');
+		for(var i = 0; i < strategy[1].length; i++) {
+			strategys[strategy[0]][strategy[1][i]] = strategy[2];
+		}
+	} else {
+		strategys[strategy[0]][strategy[1]] = strategy[2];
+	}
 }
+
 // 创建众筹机器人
 timeLog('[Process]Create robots');
 var robots = [];
