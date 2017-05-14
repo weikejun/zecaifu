@@ -10,4 +10,6 @@
 # 抢标结果
 4 10,11 * * * (cd /usr/local/apps/zecaifu;./notify_response.sh >> log/$(date +\%Y\%m\%d))
 34 15,16 * * * (cd /usr/local/apps/zecaifu;./notify_response.sh >> log/$(date +\%Y\%m\%d))
+# 数据分析
+9 23 * * * (cd /usr/local/apps/zecaifu;nodejs stat.js >> data/summary)
 # --中E抢标任务集合

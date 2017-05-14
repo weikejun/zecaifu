@@ -8,3 +8,4 @@ config/strategy.dat
 user.list
 *.swp
 *.swo
+data/*
