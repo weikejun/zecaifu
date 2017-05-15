@@ -43,10 +43,11 @@
 	$result = [];
 	foreach($recs as $idx => $rec) {
 		$recDetail = explode('|',$rec);
-		$result['summary'][$recDetail[0]] += $recDetail[3];
+		$result['summary'][$recDetail[0]][$recDetail[1]] += $recDetail[3];
+		$result['summary'][$recDetail[0]]['total'] += $recDetail[3];
 	}
 	foreach($result['summary'] as $date => $amount) {
-		echo "<a href='statDetail.php?date=$date'>$date</a> 总计\t$amount\n";
+		echo "<a href='statDetail.php?date=$date'>$date</a> 总计：\t".$amount['total']."，车：".$amount['car']." 房：".$amount['house']." 车位：".$amount['parking']."\n";
 	}
 	echo "</pre>";
 ?>

@@ -48,11 +48,11 @@
 			$recDetail = explode('|',$rec);
 			if ($dateTime != strtotime($recDetail[0])) continue;
 			$result['detail'] .= $recDetail[1] 
-				. "\t" . $recDetail[2]
-				. "\t" . $recDetail[3];
+				. "\t " . $recDetail[2]
+				. "\t " . $recDetail[3];
 			$result['summary'] += $recDetail[3];
 		}
-		echo "<b>$date 总计\t" . $result['summary'] . "</b>\n";
+		echo "<b>$date 总计：\t" . $result['summary'] . "</b>\n";
 		echo $result['detail'];
 	} else {
 		echo "暂无统计";
