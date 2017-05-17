@@ -569,6 +569,7 @@ var CFRobot = function(user){
 				if (!message) {
 					timeLog('[Event:pay.submit][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, pay error message=未知错误');
 					Fs.writeFileSync('http/pay.submit-' + _ref.userName + '-' + car.sid, body);
+					_ref.events.emit('car.detail', car);
 					return;
 				}
 				if (message[1] != "成功") {
