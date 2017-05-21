@@ -88,5 +88,5 @@ var listenTimer = setInterval(function() { // 创建监听器
 		});
 	});
 	req.end();
-}, 800);
+}, 200);
 
