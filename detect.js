@@ -736,7 +736,7 @@ timeLog('[Process]Create detector');
 var detectDispatched = { length: 0 };
 (doDetect = function() { // 创建监听器
 	var _ts = new Date();
-	var _waitElapse = 10;
+	var _waitElapse = 5;
 	if (_ts.getSeconds() % 5 != 0) {
 		setTimeout(function() {
 			doDetect();
