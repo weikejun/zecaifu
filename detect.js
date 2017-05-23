@@ -458,7 +458,8 @@ var CFRobot = function(user){
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				var message = body.match(/name="Message" value="([^"]+)"/);
 				if (message) {
-					timeLog('[Event:pay.verify][User:'+_ref.userName+'][Car:' + car.borrowName + ']Exit, message=' + message[1]);
+					timeLog('[Event:pay.verify][User:'+_ref.userName+'][Car:' + car.borrowName + ']Retry, message=' + message[1]);
+					_ref.events.emit('car.detail', car);
 					return;
 				}
 				if (body != 2) {
