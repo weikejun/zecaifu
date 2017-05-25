@@ -412,12 +412,13 @@ var CFRobot = function(user){
 		var _chunks = [];
 		var matches = detail.match(/publicKey = "([^"]+)"/);
 		if (!matches) {
+			_ref.events.emit('car.detail', car);
 			timeLog(
 				'[Event:pay.verify][User:'
 				+ _ref.userName
 				+ '][Car:' 
 				+ car.borrowName 
-				+ ']Exit, publickKey not found'
+				+ ']Retry, publickKey not found'
 			);
 			return;
 		}
