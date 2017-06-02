@@ -9,3 +9,4 @@ user.list
 *.swp
 *.swo
 data/*
+www/captcha/*
