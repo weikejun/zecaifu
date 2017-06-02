@@ -2,7 +2,7 @@
 <html>
 <head lang="en">
   <meta charset="UTF-8">
-  <title>ZeRobot - 首页</title>
+  <title>ZeRobot - 验证码提交</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="format-detection" content="telephone=no">
@@ -26,16 +26,29 @@
 </head>
 <body>
 <div class="header">
-
+  
   <hr />
 </div>
 <div class="am-g">
   <div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
-    <h3>导航 - <?php echo $_SERVER['SERVER_ADDR'] ?></h3>
+    <h3>验证码提交</h3>
     <hr>
-    <div><a href="input.php">验证码录入</a> | <a href="actLog.php">操作日志</a> | <a href="user.php">账户设置</a> | <a href="strategy.php">策略设置</a> | <a href="stat.php">平台待收</a></div>
+<?php
+$dir = dirname(__FILE__);
+echo '<pre>';
+if(isset($_POST['captcha'])) {
+	foreach($_POST['captcha'] as $fname => $capVal) {
+		if(trim($capVal) === "") continue;
+		file_put_contents("$dir/captcha/".$fname.'.res', $capVal);
+		echo date('Ymd H:i:s').' Create file '.$fname.".res, <img src='captcha/$fname.png' /> $capVal\n";
+	}
+} else {
+	echo 'no captcha submit';
+}
+echo '</pre><a href="actLog.php">查看日志</a>&nbsp;&nbsp;<a href="input.php">重新输入</a>';
+?>
     <hr>
-    <script>var dt=new Date();document.write('<p>© '+dt.getFullYear()+' Jimwei </p>');</script>
+    <p>© 2016 Jimwei </p>
   </div>
 </div>
 </body>

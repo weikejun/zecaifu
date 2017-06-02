@@ -255,18 +255,59 @@ var CFRobot = function(user){
 					return;
 				}
 				timeLog('[Event:car.detail][User:'+_ref.userName+'][Car:' + car.borrowName + ']Get pay token=' + token + ', num=' + investNum);
-				_ref.events.emit('pay.url', car, token, investNum);
+				_ref.events.emit('car.captcha', car, token, investNum);
 				Fs.writeFileSync('http/car.detail-' + _ref.userName + '-' + car.sid, body);
 			});
 		});
 		req.end();
 	});
 
-	this.events.on('pay.url', (car, token, num)=>{ // 提交众筹
+	this.events.on('car.captcha', (car, token, num)=>{ // 提交众筹
+		timeLog('[Event:car.captcha][User:'+_ref.userName+'][Car:' + car.borrowName + ']');
+		var _chunks = [];
+		var options = {
+			hostname: "www.zecaifu.com",
+			port: 443,
+			path: "/code?" + Math.random(),
+			method: "GET",
+			headers: {
+				'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.152 Safari/537.36',
+				'Accept': 'image/webp,image/*,*/*;q=0.8',
+				'Accept-Encoding': 'gzip,deflate,sdch,br',
+				'Accept-Language': 'zh-CN,zh;q=0.8,en;q=0.6',
+				'Host': 'www.zecaifu.com',
+				'Connection': 'keep-alive',
+				'Referer': 'https://www.zecaifu.com/detail/' + car.sid,
+				'Cookie': _ref.cookies['www.zecaifu.com'],
+			}
+		};
+		var req = Https.request(options, (res) => {
+			res.on('data', (chunk) => { _chunks.push(chunk); });
+			res.on('end', () => {
+				capFile = 'www/captcha/captcha-' + _ref.userName + '-' + car.sid + '.png';
+				Fs.writeFileSync(capFile, Buffer.concat(_chunks));
+			});
+		});
+		var _resFile = 'www/captcha/captcha-' + _ref.userName + '-' + car.sid+ '.res';
+		Fs.writeFileSync(_resFile, '');
+		Fs.chmodSync(_resFile, 1023);
+		Fs.watch(_resFile, function(eType, fName) {
+			var code = (Fs.readFileSync(_resFile, {encoding:'utf8'}).replace(/^\s+|\s+$/g, ''));
+			if (code.length == 4) {
+				timeLog('[Event:car.captcha][User:'+_ref.userName+'][Car:' + car.borrowName + ']Get captcha code=' + code);
+				_ref.events.emit('pay.url', car, token, num, code);
+				this.close();
+			}
+		});
+		req.end();
+	});
+
+	this.events.on('pay.url', (car, token, num, code)=>{ // 提交众筹
 		timeLog('[Event:pay.url][User:'+_ref.userName+'][Car:' + car.borrowName + ']');
 		var _chunks = [];
 		var postData = Query.stringify({
 			'_token' : token,
+			'verify_code' : code,
 			'num' : num,
 		});
 		var options = {
@@ -718,7 +759,7 @@ var userList = Fs
 	.replace(/(^\s+|\s+$)/g, '')
 	.split("\n");
 if (userList.length <= 1) {
-	paySubmitWait = 100;
+	paySubmitWait = 3000;
 }
 for(i in userList) {
 	var user = userList[i].split('|');
@@ -785,9 +826,10 @@ var detectDispatched = { length: 0 };
 					detectDispatched[list[i].sid] = 1;
 					detectDispatched['length']++;
 					_waitElapse = 1000;
+					break;
 				}
 			}
-			if (detectDispatched.length >= 4) {
+			if (detectDispatched.length >= 5) {
 				timeLog('[Detector:listen]Dispatched done, total=' + detectDispatched.length);
 				return;
 			}

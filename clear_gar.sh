@@ -30,6 +30,16 @@ for dir in $(echo "http log");do
 	doLog "Clear $dir done"
 done
 
+for f in $(ls www/captcha|egrep ".png|.res"|xargs);do
+	LASTMO=$(date -d "$(stat www/captcha/$f|grep -i "modify"|sed -r "s/modify:\s+//ig")" +%s)
+	LASTMO=$(($LASTMO + 1800))
+	if [ $(date +%s) -gt $LASTMO ];then
+		CMD="mv -f www/captcha/$f www/captcha/archives"
+		echo $CMD
+		eval $CMD
+	fi
+done
+
 doLog "Clear process start"
 for p in $(ps -ef|egrep "detect.js"|grep -v "grep"|grep -v "vim"|awk '{print $2}');do
 	STARTED=$(date -d "$(ps -p $p -o lstart|grep -v -i STARTED)" +%s)
