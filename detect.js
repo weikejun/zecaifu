@@ -70,7 +70,7 @@ var CFRobot = function(user){
 			return false;
 		}
 		var no = car.borrowName.match(/第([0-9]+)/);
-		if (_ref.strategys[no[1]] || _ref.strategys['*']) {
+		if (!_ref.strategys || _ref.strategys[no[1]] || _ref.strategys['*']) {
 			timeLog('[CFRobot:doDispatch][User:'+_ref.userName+'][Id:'+_ref.id+']');
 			_ref.events.emit('car.detail', car);
 			return _dispatched = true;
@@ -345,7 +345,12 @@ var CFRobot = function(user){
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				body = JSON.parse(body);
 				if (body.status != 2) {
-					timeLog('[Event:pay.url][User:'+_ref.userName+'][Id:'+_ref.id+'][Car:' + car.borrowName + ']Exit, message=' + body.msg);
+					if (body.msg == '验证码不正确') {
+						_ref.events.emit('car.detail', car);
+						timeLog('[Event:pay.url][User:'+_ref.userName+'][Id:'+_ref.id+'][Car:' + car.borrowName + ']Retry, message=' + body.msg);
+					} else {
+						timeLog('[Event:pay.url][User:'+_ref.userName+'][Id:'+_ref.id+'][Car:' + car.borrowName + ']Exit, message=' + body.msg);
+					}
 					return;
 				}
 				timeLog('[Event:pay.url][User:'+_ref.userName+'][Id:'+_ref.id+'][Car:' + car.borrowName + ']Pay start, url=' + body.msg);
@@ -743,6 +748,7 @@ var strategyList = Fs
 	.split("\n");
 for(i in strategyList) {
 	var strategy = strategyList[i].replace(/\s+/g, '').split('|');
+	if (!strategy[0]) continue;
 	if(!strategys[strategy[0]]) {
 		strategys[strategy[0]] = {};
 	}

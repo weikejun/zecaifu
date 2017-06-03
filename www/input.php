@@ -84,7 +84,7 @@ var delStack = {};
 				srvTime = data.srv_t;
 				setTimeout(function() {
 					syncSrvDate();
-				}, 500);
+				}, 300);
 			}
 	})
 })();
