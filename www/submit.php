@@ -48,7 +48,7 @@ if(isset($_POST['captcha'])) {
 echo '</pre><a href="actLog.php">查看日志</a>&nbsp;&nbsp;<a href="input.php">重新输入</a>';
 ?>
     <hr>
-    <p>© 2016 Jimwei </p>
+    <script>var dt=new Date();document.write('<p>© '+dt.getFullYear()+' Jimwei </p>');</script>
   </div>
 </div>
 </body>

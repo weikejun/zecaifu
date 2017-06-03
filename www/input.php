@@ -47,7 +47,7 @@
       </div>
     </form>
     <hr>
-    <p>© 2016 Jimwei </p>
+    <script>var dt=new Date();document.write('<p>© '+dt.getFullYear()+' Jimwei </p>');</script>
   </div>
 </div>
 <script src="/js/jquery-3.1.1.min.js"></script>
