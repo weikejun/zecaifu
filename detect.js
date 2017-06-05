@@ -52,7 +52,6 @@ var CFRobot = function(user){
 	var _dispatched = false;
 	var _balance = 0;
 	var _detailSubmit = 0;
-	var _paySubmit = 0;
 
 	this.setCookie = function(cookies, hostname) {
 		this.cookies[hostname] = this.cookies[hostname] || '';
@@ -616,7 +615,7 @@ var CFRobot = function(user){
 		var req = Https.request(options, (res) => {
 			res.on('data', (chunk) => { _chunks.push(chunk); });
 			res.on('end', () => {
-				_paySubmit--;
+				sLock[_ref.userName]--;
 				var body = chunkToStr(Buffer.concat(_chunks), res.headers['content-encoding']);
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				var message = body.match(/name="Message" value="([^"]*)"/);
@@ -642,14 +641,14 @@ var CFRobot = function(user){
 
 		req.write(postData);
 		var subTimer = setInterval(function() {
-			if(_paySubmit) {
+			if(sLock[_ref.userName]) {
 				return;
 			}
-			_paySubmit++;
+			sLock[_ref.userName]++;
 			clearInterval(subTimer);
 			req.end();
 			setTimeout(function() {
-				_paySubmit--;
+				sLock[_ref.userName]--;
 			}, paySubmitWait)
 		}, 1);
 	});
@@ -775,6 +774,7 @@ if (userList.length <= 1) {
 	paySubmitWait = 3000;
 }
 var workerNum = 5;
+var sLock = [];
 for(i in userList) {
 	var user = userList[i].split('|');
 	for (var wn = 1000; wn < 1000 + workerNum; wn++) {
@@ -791,6 +791,7 @@ for(i in userList) {
 		robots.push(robot);
 	}
 	robotsList[user[0]] = robots;
+	sLock[user[0]] = 0;
 }
 
 timeLog('[Process]Create detector');
