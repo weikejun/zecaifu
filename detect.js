@@ -7,7 +7,7 @@ const Query = require('querystring');
 const Util = require('util');
 const Url = require('url');
 const Encrypt = require('./tools/encrypt.js');
-var paySubmitWait = 8000;
+var paySubmitWait = 5000;
 
 // 通用函数
 var chunkToStr = function(chunk, enc) {
