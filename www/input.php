@@ -53,7 +53,7 @@
 <script src="/js/jquery-3.1.1.min.js"></script>
 <script>
 var srvTime = 0;
-var inputTpl = '<label id="lable_captcha[$FILE_NAME$]" for="captcha[$FILE_NAME$]"><img style="width:231px;height:84px" id="img_captcha[$FILE_NAME$]" src="$IMG_SRC$"></label><input autocomplete="off" type="text" name="captcha[$FILE_NAME$]" id="captcha[$FILE_NAME$]" value="$CAP_CODE$" onblur="blurSubmit(this);">';
+var inputTpl = '<label id="lable_captcha[$FILE_NAME$]" for="captcha[$FILE_NAME$]"><img style="width:231px;height:84px" id="img_captcha[$FILE_NAME$]" src="$IMG_SRC$"></label><input autocomplete="off" type="text" name="captcha[$FILE_NAME$]" id="captcha[$FILE_NAME$]" value="$CAP_CODE$" onblur="blurSubmit(this);" onkeyup="autoSub(this)">';
 function blurSubmit(inst) {
 	$.ajax({
 		url: "/singleSub.php?"+$(inst).attr('id')+"="+$(inst).val(),
@@ -61,6 +61,11 @@ function blurSubmit(inst) {
 			success: function(data) {}
 	});	
 };
+function autoSub(inst) {
+	if ($(inst).val().length == 4) {
+		blurSubmit(inst);
+	}
+}
 var delStack = {};
 (syncSrvDate = function() {
 	$.ajax({
@@ -79,6 +84,7 @@ var delStack = {};
 						} else {
 							$("#inputs").append(inputTpl.replace(/\$IMG_SRC\$/g, data.caps[i].img_src).replace(/\$CAP_CODE\$/g, data.caps[i].cap_code).replace(/\$FILE_NAME\$/g, data.caps[i].file_name));
 						}
+						$("#"+idStr).focus();
 					}		
 				}
 				srvTime = data.srv_t;

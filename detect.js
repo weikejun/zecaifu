@@ -71,7 +71,7 @@ var CFRobot = function(user){
 		}
 		var no = car.borrowName.match(/第([0-9]+)/);
 		if (!_ref.strategys || _ref.strategys[no[1]] || _ref.strategys['*']) {
-			timeLog('[CFRobot:doDispatch][User:'+_ref.userName+'][Id:'+_ref.id+']');
+			timeLog('[CFRobot:doDispatch][User:'+_ref.userName+'][Id:'+_ref.id+'][Car:' + car.borrowName + ']Hit');
 			_ref.events.emit('car.detail', car);
 			return _dispatched = true;
 		}
@@ -774,7 +774,7 @@ var userList = Fs
 if (userList.length <= 1) {
 	paySubmitWait = 3000;
 }
-var workerNum = 4;
+var workerNum = 5;
 for(i in userList) {
 	var user = userList[i].split('|');
 	for (var wn = 1000; wn < 1000 + workerNum; wn++) {
