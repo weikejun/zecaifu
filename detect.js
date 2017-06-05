@@ -771,7 +771,7 @@ var userList = Fs
 	.replace(/(^\s+|\s+$)/g, '')
 	.split("\n");
 if (userList.length <= 1) {
-	paySubmitWait = 3000;
+	paySubmitWait = 5000;
 }
 var workerNum = 5;
 var sLock = [];
