@@ -1,7 +1,7 @@
 # --中E抢标任务集合
 # 抢标监听进程
-0 10,11 * * * (cd /usr/local/apps/zecaifu;nodejs detect.js >> log/$(date +\%Y\%m\%d))
-30 15,16 * * * (cd /usr/local/apps/zecaifu;nodejs detect.js >> log/$(date +\%Y\%m\%d))
+59 9,10 * * * (cd /usr/local/apps/zecaifu;nodejs detect.js >> log/$(date +\%Y\%m\%d))
+29 15,16 * * * (cd /usr/local/apps/zecaifu;nodejs detect.js >> log/$(date +\%Y\%m\%d))
 # 抢车提醒
 50 9,10 * * * (cd /usr/local/apps/zecaifu;./set_user_list.sh >> log/$(date +\%Y\%m\%d))
 20 15,16 * * * (cd /usr/local/apps/zecaifu;./set_user_list.sh >> log/$(date +\%Y\%m\%d))

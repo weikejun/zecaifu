@@ -18,7 +18,7 @@ for f in $(ls $DIR|xargs);do
 done
 }
 
-for dir in $(echo "cookies amount tigger");do
+for dir in $(echo "cookies amount tigger www/captcha/login");do
 	doLog "Clear $dir start"
 	doClear "$dir" 1800
 	doLog "Clear $dir done"

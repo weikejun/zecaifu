@@ -33,7 +33,7 @@
   <div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
     <h3>导航 - <?php echo $_SERVER['SERVER_ADDR'] ?></h3>
     <hr>
-    <div><a href="input.php">验证码录入</a> | <a href="actLog.php">操作日志</a> | <a href="user.php">账户设置</a> | <a href="strategy.php">策略设置</a> | <a href="stat.php">平台待收</a></div>
+    <div><a href="input.php">抢标验证码录入</a> | <a href="login/input.php">登录验证码录入</a> | <a href="actLog.php">操作日志</a> | <a href="user.php">账户设置</a> | <a href="strategy.php">策略设置</a> | <a href="stat.php">平台待收</a></div>
     <hr>
     <script>var dt=new Date();document.write('<p>© '+dt.getFullYear()+' Jimwei </p>');</script>
   </div>

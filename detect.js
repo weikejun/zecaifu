@@ -101,31 +101,84 @@ var CFRobot = function(user){
 			res.on('data', (chunk) => { chunks.push(chunk); });
 			res.on('end', () => {
 				var body = chunkToStr(Buffer.concat(chunks), res.headers['content-encoding']);
+				Fs.writeFileSync('http/user.login-' + _ref.userName + '-' + _ref.id, body);
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				var match = body.match(/_token" value="[^"]+/);
 				if (!match) {
 					timeLog('[Event:user.login][User:'+_ref.userName+'][Id:'+_ref.id+']Exit, message=登录错误');
-					Fs.writeFileSync('http/user.login-' + _ref.userName + '-' + _ref.id, body);
 					return;
 				}
-				_ref.events.emit('user.login.submit', match[0].replace('_token" value="', ''));
+				_ref.events.emit('user.captcha', match[0].replace('_token" value="', ''), body.match(/id="verify_code"/));
 			});
+		});
+		var subTimer = setInterval(function() {
+			if(sLock[_ref.userName]) {
+				return;
+			}
+			sLock[_ref.userName]++;
+			clearInterval(subTimer);
+			req.end();
+		}, 1);
+	});
+
+	this.events.on('user.captcha', (token, vcode)=>{ // 登录验证码
+		timeLog('[Event:user.captcha][User:'+_ref.userName+'][Id:'+_ref.id+']');
+		if (!vcode) {
+			timeLog('[Event:user.captcha][User:'+_ref.userName+'][Id:'+_ref.id+']No captcha, go next');
+			_ref.events.emit('user.login.submit', token);
+			return;
+		}
+		var _chunks = [];
+		var options = {
+			hostname: "www.zecaifu.com",
+			port: 443,
+			path: "/code?" + Math.random(),
+			method: "GET",
+			headers: {
+				'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.152 Safari/537.36',
+				'Accept': 'image/webp,image/*,*/*;q=0.8',
+				'Accept-Encoding': 'gzip,deflate,sdch,br',
+				'Accept-Language': 'zh-CN,zh;q=0.8,en;q=0.6',
+				'Host': 'www.zecaifu.com',
+				'Connection': 'keep-alive',
+				'Referer': 'https://www.zecaifu.com/login',
+				'Cookie': _ref.cookies['www.zecaifu.com'],
+			}
+		};
+		var _capFile = 'www/captcha/login/' + _ref.userName + '-' + _ref.id + '.png';
+		var _resFile = 'www/captcha/login/' + _ref.userName + '-' + _ref.id + '.res';
+		var req = Https.request(options, (res) => {
+			res.on('data', (chunk) => { _chunks.push(chunk); });
+			res.on('end', () => {
+				Fs.writeFileSync(_capFile, Buffer.concat(_chunks));
+			});
+		});
+		Fs.writeFileSync(_resFile, '');
+		Fs.chmodSync(_resFile, 1023);
+		Fs.watch(_resFile, function(eType, fName) {
+			var code = (Fs.readFileSync(_resFile, {encoding:'utf8'}).replace(/^\s+|\s+$/g, ''));
+			if (code.length == 4) {
+				timeLog('[Event:user.captcha][User:'+_ref.userName+'][Id:'+_ref.id+']Get captcha code=' + code);
+				_ref.events.emit('user.login.submit', token, code);
+				this.close();
+			}
 		});
 		req.end();
 	});
 
-	this.events.on('user.login.submit', function(token) { // 登录页
+	this.events.on('user.login.submit', function(token, code) { // 登录页
 		timeLog('[Event:user.login.submit][User:'+_ref.userName+'][Id:'+_ref.id+']');
 		var cookiePath = 'cookies/www.zecaifu.com-' + _ref.userName + '-' + _ref.id;
 		var chunks = [];
-		if (Fs.existsSync(cookiePath)) {
+		/*if (Fs.existsSync(cookiePath)) {
 			_ref.cookies = JSON.parse(Fs.readFileSync(cookiePath, 'utf8'));
 			_ref.auth = 1;
 			_ref.events.emit('user.profile');
 			return;
-		}
+		}*/
 		var postData = Query.stringify({
 			'_token' : token,
+		    	'verify_code': (code ? code : ''),
 			'username' : _ref.userName,
 			'password' : _ref.loginPass
 		});
@@ -152,8 +205,15 @@ var CFRobot = function(user){
 		var req = Https.request(options, (res) => {
 			res.on('data', (chunk) => { chunks.push(chunk); });
 			res.on('end', () => {
+				sLock[_ref.userName]--;
 				var body = chunkToStr(Buffer.concat(chunks), res.headers['content-encoding']);
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
+				var match = _ref.cookies['www.zecaifu.com'].match(/username=/);
+				if (!match) {
+					_ref.events.emit('user.login');
+					_ref.auth = 0;
+					return;
+				}
 				_ref.auth = 1;
 				Fs.writeFileSync(cookiePath, JSON.stringify(_ref.cookies));
 				_ref.events.emit('user.profile');
@@ -188,7 +248,12 @@ var CFRobot = function(user){
 			res.on('data', (chunk) => { chunks.push(chunk); });
 			res.on('end', () => {
 				var body = chunkToStr(Buffer.concat(chunks), res.headers['content-encoding']);
-				_ref.profile = JSON.parse(body);
+				try {
+					_ref.profile = JSON.parse(body);
+				} catch(e) {
+					timeLog('[Event:user.profile][User:'+_ref.userName+'][Id:'+_ref.id+']Exit, get balance error');
+					return;
+				}
 				_balance = _ref.profile[0].replace(',', '');  
 				timeLog('[Event:user.profile][User:'+_ref.userName+'][Id:'+_ref.id+']Get balance=' + _ref.profile[0]);
 			});
@@ -777,6 +842,7 @@ var workerNum = 5;
 var sLock = [];
 for(i in userList) {
 	var user = userList[i].split('|');
+	sLock[user[0]] = 0;
 	for (var wn = 1000; wn < 1000 + workerNum; wn++) {
 		var robot = new CFRobot({
 			id: wn,
@@ -791,7 +857,6 @@ for(i in userList) {
 		robots.push(robot);
 	}
 	robotsList[user[0]] = robots;
-	sLock[user[0]] = 0;
 }
 
 timeLog('[Process]Create detector');

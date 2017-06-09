@@ -3,7 +3,7 @@
 <html>
 <head lang="en">
   <meta charset="UTF-8">
-  <title>ZeRobot - 抢标验证码录入</title>
+  <title>ZeRobot - 登录验证码录入</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="format-detection" content="telephone=no">
@@ -38,13 +38,11 @@
 </div>
 <div class="am-g">
   <div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
-    <h3>抢标验证码录入(时间:<span id="now_time">--:--:--</span>)</h3>
+    <h3>登录验证码录入(时间:<span id="now_time">--:--:--</span>)</h3>
     <hr>
     <form id="sub_form" method="post" class="am-form" action="submit.php">
       <div id="inputs"></div>
-      <div class="am-cf">
-	<br /><input type="submit" name="" value="提 交" class="am-btn am-btn-primary am-btn-sm am-fl">
-      </div>
+      <div class="am-cf"></div>
     </form>
     <hr>
     <script>var dt=new Date();document.write('<p>© '+dt.getFullYear()+' Jimwei </p>');</script>
@@ -56,7 +54,7 @@ var srvTime = 0;
 var inputTpl = '<label id="lable_captcha[$FILE_NAME$]" for="captcha[$FILE_NAME$]"><img style="width:231px;height:84px" id="img_captcha[$FILE_NAME$]" src="$IMG_SRC$"></label><input autocomplete="off" type="text" name="captcha[$FILE_NAME$]" id="captcha[$FILE_NAME$]" value="$CAP_CODE$" onblur="blurSubmit(this);" onkeyup="autoSub(this)">';
 function blurSubmit(inst) {
 	$.ajax({
-		url: "/singleSub.php?"+$(inst).attr('id')+"="+$(inst).val(),
+		url: "singleSub.php?"+$(inst).attr('id')+"="+$(inst).val(),
 			type: "GET",
 			success: function(data) {}
 	});	
@@ -77,7 +75,7 @@ function autoSub(inst) {
 var delStack = {};
 (syncSrvDate = function() {
 	$.ajax({
-		url: "/syncCap.php?srv_t=" + srvTime,
+		url: "syncCap.php?srv_t=" + srvTime,
 			type: "GET",
 			dataType: "json",
 			success: function(data, status, xhr) {
