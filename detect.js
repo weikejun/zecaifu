@@ -85,6 +85,7 @@ var CaptchaHacker = {
 				var body = chunkToStr(Buffer.concat(chunks));
 				var res = JSON.parse(body);
 				if(res.ret == 0) {
+					timeLog('[CaptchaHacker:decode]code='+res.result);
 					Fs.writeFileSync(outFile, res.result);
 				}
 			});
