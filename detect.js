@@ -7,6 +7,8 @@ const Query = require('querystring');
 const Util = require('util');
 const Url = require('url');
 const Encrypt = require('./tools/encrypt.js');
+const Http = require('http');
+const Crypto = require('crypto');
 var paySubmitWait = 5000;
 
 // 通用函数
@@ -34,6 +36,63 @@ var timeLog = function(logStr) {
 			+ t.getSeconds() + '.' 
 			+ t.getMilliseconds() + ' '
 			+ logStr);
+};
+
+// captcha OCR对象
+var CaptchaHacker = {
+	'appID': 47723,
+	'user': 'xxxwkj',
+	'password': 'wkj12345678',
+	'appKey': 'fbc784438071426f6c0b954984570c15',
+	getPwd: function() {
+		var hashU = Crypto.createHash('md5')
+			.update(this.user).digest('hex');
+		var hashP = Crypto.createHash('md5')
+			.update(this.password).digest('hex');
+		var hashUP = Crypto.createHash('md5')
+			.update(hashU+hashP).digest('hex');
+		return Crypto.createHash('md5')
+			.update(this.appKey+hashUP).digest('hex');
+	},
+	getSign: function(data) {
+		return Crypto.createHash('md5')
+			.update(this.appKey+this.user+data.toString('binary')).digest('hex')
+			.substr(0, 8);
+	},
+	decode: function(data, outFile) {
+		var chunks = [];
+		var postData = Query.stringify({
+			'appID' : this.appID,
+		    	'user': this.user,
+			'pwd' : this.getPwd(),
+			'sign' :this.getSign(data),
+			'type': 42,
+		    	'fileData': data.toString('hex')
+		});
+		var options = {
+			hostname: "api.dama2.com",
+			port: 7766,
+			path: "/app/d2File?"+postData,
+			method: "POST",
+			headers: {
+				'Content-Type': 'text/html;charset=utf8',
+				'Content-Length': Buffer.byteLength(postData)
+			}
+		};
+		var req = Http.request(options, (res) => {
+			res.on('data', (chunk) => { chunks.push(chunk); });
+			res.on('end', () => {
+				var body = chunkToStr(Buffer.concat(chunks));
+				var res = JSON.parse(body);
+				if(res.ret == 0) {
+					Fs.writeFileSync(outFile, res.result);
+				}
+			});
+		});
+
+		//req.write(postData);
+		req.end();
+	}
 };
 
 // 众筹抢标器定义，响应事件注册
@@ -151,6 +210,7 @@ var CFRobot = function(user){
 			res.on('data', (chunk) => { _chunks.push(chunk); });
 			res.on('end', () => {
 				Fs.writeFileSync(_capFile, Buffer.concat(_chunks));
+				CaptchaHacker.decode(Buffer.concat(_chunks), _resFile);
 			});
 		});
 		Fs.writeFileSync(_resFile, '');
@@ -352,14 +412,15 @@ var CFRobot = function(user){
 				'Cookie': _ref.cookies['www.zecaifu.com'],
 			}
 		};
+		var _resFile = 'www/captcha/captcha-' + _ref.userName + '-' + car.sid+ '.res';
 		var req = Https.request(options, (res) => {
 			res.on('data', (chunk) => { _chunks.push(chunk); });
 			res.on('end', () => {
 				capFile = 'www/captcha/captcha-' + _ref.userName + '-' + car.sid + '.png';
 				Fs.writeFileSync(capFile, Buffer.concat(_chunks));
+				CaptchaHacker.decode(Buffer.concat(_chunks), _resFile);
 			});
 		});
-		var _resFile = 'www/captcha/captcha-' + _ref.userName + '-' + car.sid+ '.res';
 		Fs.writeFileSync(_resFile, '');
 		Fs.chmodSync(_resFile, 1023);
 		Fs.watch(_resFile, function(eType, fName) {
