@@ -905,6 +905,7 @@ var sLock = [];
 for(i in userList) {
 	var user = userList[i].split('|');
 	sLock[user[0]] = 0;
+	robots = [];
 	for (var wn = 1000; wn < 1000 + workerNum; wn++) {
 		var robot = new CFRobot({
 			id: wn,
