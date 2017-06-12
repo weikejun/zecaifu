@@ -898,6 +898,10 @@ var userList = Fs
 	.replace(/(^\s+|\s+$)/g, '')
 	.split("\n");
 if (userList.length <= 1) {
+	if(!userList[0]) {
+		timeLog('[Process]Exit, no user join');
+		process.exit();
+	}
 	paySubmitWait = 5000;
 }
 var workerNum = 5;
