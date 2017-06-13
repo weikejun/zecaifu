@@ -60,6 +60,10 @@ var CaptchaHacker = {
 			.substr(0, 8);
 	},
 	decode: function(data, outFile) {
+		var code = Fs.readFileSync(outFile, {encoding:'utf8'});
+		if (code.length >= 4) {
+			return;
+		}
 		var chunks = [];
 		var postData = Query.stringify({
 			'appID' : this.appID,
