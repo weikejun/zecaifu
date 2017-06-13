@@ -60,10 +60,6 @@ var CaptchaHacker = {
 			.substr(0, 8);
 	},
 	decode: function(data, outFile) {
-		var code = Fs.readFileSync(outFile, {encoding:'utf8'});
-		if (code.length >= 4) {
-			return;
-		}
 		var chunks = [];
 		var postData = Query.stringify({
 			'appID' : this.appID,
@@ -86,6 +82,10 @@ var CaptchaHacker = {
 		var req = Http.request(options, (res) => {
 			res.on('data', (chunk) => { chunks.push(chunk); });
 			res.on('end', () => {
+				var code = Fs.readFileSync(outFile, {encoding:'utf8'});
+				if (code.length >= 4) {
+					return;
+				}
 				var body = chunkToStr(Buffer.concat(chunks));
 				var res = JSON.parse(body);
 				if(res.ret == 0) {

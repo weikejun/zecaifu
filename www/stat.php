@@ -43,6 +43,7 @@
 	$result = [];
 	foreach($recs as $idx => $rec) {
 		$recDetail = explode('|',$rec);
+		$recDetail[0] = date('Y-m-d', strtotime($recDetail[0]));
 		$result['summary'][$recDetail[0]][$recDetail[1]] += $recDetail[3];
 		$result['summary'][$recDetail[0]]['total'] += $recDetail[3];
 	}
