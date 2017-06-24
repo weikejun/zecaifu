@@ -63,7 +63,7 @@ function autoSub(inst) {
 	if ($(inst).val().length == 4) {
 		blurSubmit(inst);
 		var fo = false;
-		$('input').each(function() {
+		$(':text').each(function() {
 			if (fo) return;
 			if ($(this).val() == "") {
 				$(this).focus();
@@ -90,7 +90,7 @@ var delStack = {};
 						} else {
 							$("#inputs").append(inputTpl.replace(/\$IMG_SRC\$/g, data.caps[i].img_src).replace(/\$CAP_CODE\$/g, data.caps[i].cap_code).replace(/\$FILE_NAME\$/g, data.caps[i].file_name));
 						}
-						if ($("input").length == 1) $("#"+idStr).focus();
+						if ($(":text").length == 1) $("#"+idStr).focus();
 					}		
 				}
 				srvTime = data.srv_t;

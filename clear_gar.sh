@@ -30,7 +30,7 @@ for dir in $(echo "http log");do
 	doLog "Clear $dir done"
 done
 
-for f in $(ls www/captcha|egrep ".png|.res"|xargs);do
+for f in $(ls www/captcha|egrep ".png|.res|.gif"|xargs);do
 	LASTMO=$(date -d "$(stat www/captcha/$f|grep -i "modify"|sed -r "s/modify:\s+//ig")" +%s)
 	LASTMO=$(($LASTMO + 1800))
 	if [ $(date +%s) -gt $LASTMO ];then

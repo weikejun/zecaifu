@@ -9,7 +9,9 @@ const Url = require('url');
 const Encrypt = require('./tools/encrypt.js');
 const Http = require('http');
 const Crypto = require('crypto');
+const Cmd = require('child_process');
 var paySubmitWait = 5000;
+var detectorType = process.argv[2] || 'car';
 
 // 通用函数
 var chunkToStr = function(chunk, enc) {
@@ -59,7 +61,7 @@ var CaptchaHacker = {
 			.update(this.appKey+this.user+data.toString('binary')).digest('hex')
 			.substr(0, 8);
 	},
-	decode: function(data, outFile) {
+	decode: function(data, outFile, imgFile) {
 		var chunks = [];
 		var postData = Query.stringify({
 			'appID' : this.appID,
@@ -91,6 +93,8 @@ var CaptchaHacker = {
 				if(res.ret == 0) {
 					timeLog('[CaptchaHacker:decode]code='+res.result);
 					Fs.writeFileSync(outFile, res.result);
+					var ntime = (new Date()).getTime().toString().substr(0, 10);
+					Fs.utimesSync(imgFile, ntime, ntime);
 				}
 			});
 		});
@@ -215,14 +219,19 @@ var CFRobot = function(user){
 			res.on('data', (chunk) => { _chunks.push(chunk); });
 			res.on('end', () => {
 				Fs.writeFileSync(_capFile, Buffer.concat(_chunks));
-				CaptchaHacker.decode(Buffer.concat(_chunks), _resFile);
+				var _filePath = "login/" + _ref.userName + '-' + _ref.id;
+				Cmd.execSync("php tools/pre_captcha.php "  + _filePath);
+				Cmd.execSync("./auto_ocr.sh " + _filePath);
+				var ntime = (new Date()).getTime().toString().substr(0, 10);
+				Fs.utimesSync(_capFile, ntime, ntime);
+				//CaptchaHacker.decode(Buffer.concat(_chunks), _resFile, _capFile);
 			});
 		});
 		Fs.writeFileSync(_resFile, '');
 		Fs.chmodSync(_resFile, 1023);
 		Fs.watch(_resFile, function(eType, fName) {
 			var code = (Fs.readFileSync(_resFile, {encoding:'utf8'}).replace(/^\s+|\s+$/g, ''));
-			if (code.length == 4) {
+			if (true || code.length == 4) {
 				timeLog('[Event:user.captcha][User:'+_ref.userName+'][Id:'+_ref.id+']Get captcha code=' + code);
 				_ref.events.emit('user.login.submit', token, code);
 				this.close();
@@ -275,7 +284,12 @@ var CFRobot = function(user){
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				var match = _ref.cookies['www.zecaifu.com'].match(/username=/);
 				if (!match) {
-					_ref.events.emit('user.login');
+					if (code) {
+					timeLog('[Event:user.login.submit][User:'+_ref.userName+'][Id:'+_ref.id+']Captcha error');
+						_ref.events.emit('user.captcha', token, true);
+					} else {
+						_ref.events.emit('user.login');
+					}
 					_ref.auth = 0;
 					return;
 				}
@@ -418,19 +432,24 @@ var CFRobot = function(user){
 			}
 		};
 		var _resFile = 'www/captcha/captcha-' + _ref.userName + '-' + car.sid+ '.res';
+		var _capFile = 'www/captcha/captcha-' + _ref.userName + '-' + car.sid + '.png';
 		var req = Https.request(options, (res) => {
 			res.on('data', (chunk) => { _chunks.push(chunk); });
 			res.on('end', () => {
-				capFile = 'www/captcha/captcha-' + _ref.userName + '-' + car.sid + '.png';
-				Fs.writeFileSync(capFile, Buffer.concat(_chunks));
-				CaptchaHacker.decode(Buffer.concat(_chunks), _resFile);
+				Fs.writeFileSync(_capFile, Buffer.concat(_chunks));
+				var _filePath = "captcha-" + _ref.userName + '-' + car.sid;
+				Cmd.execSync("php tools/pre_captcha.php "  + _filePath);
+				Cmd.execSync("./auto_ocr.sh " + _filePath);
+				var ntime = (new Date()).getTime().toString().substr(0, 10);
+				Fs.utimesSync(_capFile, ntime, ntime);
+				CaptchaHacker.decode(Buffer.concat(_chunks), _resFile, _capFile);
 			});
 		});
 		Fs.writeFileSync(_resFile, '');
 		Fs.chmodSync(_resFile, 1023);
 		Fs.watch(_resFile, function(eType, fName) {
 			var code = (Fs.readFileSync(_resFile, {encoding:'utf8'}).replace(/^\s+|\s+$/g, ''));
-			if (code.length == 4) {
+			if (true || code.length == 4) {
 				timeLog('[Event:car.captcha][User:'+_ref.userName+'][Id:'+_ref.id+'][Car:' + car.borrowName + ']Get captcha code=' + code);
 				_ref.events.emit('pay.url', car, token, num, code);
 				this.close();
@@ -476,8 +495,8 @@ var CFRobot = function(user){
 				body = JSON.parse(body);
 				if (body.status != 2) {
 					if (body.msg == '验证码不正确') {
-						_ref.events.emit('car.detail', car);
 						timeLog('[Event:pay.url][User:'+_ref.userName+'][Id:'+_ref.id+'][Car:' + car.borrowName + ']Retry, message=' + body.msg);
+						_ref.events.emit('car.captcha', car, token, num);
 					} else {
 						timeLog('[Event:pay.url][User:'+_ref.userName+'][Id:'+_ref.id+'][Car:' + car.borrowName + ']Exit, message=' + body.msg);
 					}
@@ -747,6 +766,7 @@ var CFRobot = function(user){
 			res.on('data', (chunk) => { _chunks.push(chunk); });
 			res.on('end', () => {
 				sLock[_ref.userName]--;
+				_dispatched = false;
 				var body = chunkToStr(Buffer.concat(_chunks), res.headers['content-encoding']);
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				var message = body.match(/name="Message" value="([^"]*)"/);
@@ -908,7 +928,7 @@ if (userList.length <= 1) {
 	}
 	paySubmitWait = 5000;
 }
-var workerNum = 5;
+var workerNum = 10;
 var sLock = [];
 for(i in userList) {
 	var user = userList[i].split('|');
@@ -930,7 +950,7 @@ for(i in userList) {
 	robotsList[user[0]] = robots;
 }
 
-timeLog('[Process]Create detector');
+timeLog('[Process]Create detector, type=' + detectorType);
 var detectDispatched = { length: 0 };
 (doDetect = function() { // 创建监听器
 	var _ts = new Date();
@@ -945,7 +965,7 @@ var detectDispatched = { length: 0 };
 	var options = {
 		hostname: "api.zecaifu.com",
 		port: 443,
-		path: '/api/v2/list/car/all/run?page=1&app_token=03b22a29e10a9fe2fc3cf72ba7e07688&',
+		path: '/api/v2/list/'+detectorType+'/all/run?page=1&app_token=03b22a29e10a9fe2fc3cf72ba7e07688&',
 		method: "GET",
 		headers: {
 			'Host': 'api.zecaifu.com',

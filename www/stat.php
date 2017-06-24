@@ -49,7 +49,7 @@
 	}
 	krsort($result['summary']);
 	foreach($result['summary'] as $date => $amount) {
-		echo "<a href='statDetail.php?date=$date'>$date</a> 总计：\t".$amount['total']."，车：".$amount['car']." 房：".$amount['house']." 车位：".$amount['parking']."\n";
+		echo "<a href='statDetail.php?date=$date'>$date</a> 总计：".$amount['total']."，车：".$amount['car']." 房：".$amount['house']." 车位：".$amount['parking']."\n";
 	}
 	echo "</pre>";
 ?>
