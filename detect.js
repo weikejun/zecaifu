@@ -442,7 +442,7 @@ var CFRobot = function(user){
 				Cmd.execSync("./auto_ocr.sh " + _filePath);
 				var ntime = (new Date()).getTime().toString().substr(0, 10);
 				Fs.utimesSync(_capFile, ntime, ntime);
-				CaptchaHacker.decode(Buffer.concat(_chunks), _resFile, _capFile);
+				//CaptchaHacker.decode(Buffer.concat(_chunks), _resFile, _capFile);
 			});
 		});
 		Fs.writeFileSync(_resFile, '');
@@ -928,7 +928,7 @@ if (userList.length <= 1) {
 	}
 	paySubmitWait = 5000;
 }
-var workerNum = 10;
+var workerNum = 5;
 var sLock = [];
 for(i in userList) {
 	var user = userList[i].split('|');
