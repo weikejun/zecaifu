@@ -221,7 +221,7 @@ var CFRobot = function(user){
 				Fs.writeFileSync(_capFile, Buffer.concat(_chunks));
 				var _filePath = "login/" + _ref.userName + '-' + _ref.id;
 				Cmd.execSync("php tools/pre_captcha.php "  + _filePath);
-				Cmd.execSync("./auto_ocr.sh " + _filePath);
+				//Cmd.execSync("./auto_ocr.sh " + _filePath);
 				var ntime = (new Date()).getTime().toString().substr(0, 10);
 				Fs.utimesSync(_capFile, ntime, ntime);
 				//CaptchaHacker.decode(Buffer.concat(_chunks), _resFile, _capFile);
@@ -439,7 +439,7 @@ var CFRobot = function(user){
 				Fs.writeFileSync(_capFile, Buffer.concat(_chunks));
 				var _filePath = "captcha-" + _ref.userName + '-' + car.sid;
 				Cmd.execSync("php tools/pre_captcha.php "  + _filePath);
-				Cmd.execSync("./auto_ocr.sh " + _filePath);
+				//Cmd.execSync("./auto_ocr.sh " + _filePath);
 				var ntime = (new Date()).getTime().toString().substr(0, 10);
 				Fs.utimesSync(_capFile, ntime, ntime);
 				//CaptchaHacker.decode(Buffer.concat(_chunks), _resFile, _capFile);
@@ -928,7 +928,7 @@ if (userList.length <= 1) {
 	}
 	paySubmitWait = 5000;
 }
-var workerNum = 5;
+var workerNum = 10;
 var sLock = [];
 for(i in userList) {
 	var user = userList[i].split('|');

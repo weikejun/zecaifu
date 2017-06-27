@@ -5,7 +5,14 @@ $fName = $argv[1];
 $imgInfo = getimagesize("$imgRoot/$fName.png");
 $imgRes = imagecreatefrompng("$imgRoot/$fName.png");
 
-$st = gettimeofday(true);
+$vectors = file(dirname(__FILE__).'/words_vec.uni.dat');
+$chasLib = [];
+foreach($vectors as $vector) {
+	list($word, $cha) = explode("|", $vector);
+	$cha = explode(",", trim($cha));
+	$chasLib[$word][] = $cha;
+}
+
 $rgbWhite = ((255<<16)|(255<<8)|255);
 $rgbNoise = false;
 for($r = 0; $r < 3; $r++) {
@@ -134,13 +141,24 @@ for($x = 0; $x < imagesx($imgRes); $x++) {
 
 $oimg = imagecreate($imgInfo[1]*4, $imgInfo[1]);
 imagecolorallocate($oimg, 255, 255, 255);
+$text = "";
 for($i = 0; $i < count($wimgs); $i++) {
 	$info = getBoundrayArea($wimgs[$i]);
 	$boundary = $info['boundary'];
-	imagecopy($oimg, $wimgs[$i], $imgInfo[1]*$i + 0.5*($imgInfo[1] - ($boundary[1]-$boundary[0])), 0.5*($imgInfo[1]-$boundary[3]+$boundary[2]), $boundary[0], $boundary[2], $boundary[1]-$boundary[0]+1, $boundary[3]-$boundary[2]+1);
+	//imagecopy($oimg, $wimgs[$i], $imgInfo[1]*$i + 0.5*($imgInfo[1] - ($boundary[1]-$boundary[0])), 0.5*($imgInfo[1]-$boundary[3]+$boundary[2]), $boundary[0], $boundary[2], $boundary[1]-$boundary[0]+1, $boundary[3]-$boundary[2]+1);
+	$pRes = imagecrop($wimgs[$i], [
+		'x' => $boundary[0],
+		'y' => $boundary[2],
+		'width' => $boundary[1] - $boundary[0] + 1,
+		'height' => $boundary[3] - $boundary[2] + 1
+	]);
+	$text.=doOcr(getVector($pRes));
 }
+
+file_put_contents("$imgRoot/$fName.res", $text);
+echo $text;
 //imagepng($imgRes, "$imgRoot/$fName.mid.png");
-imagegif($oimg, "$imgRoot/$fName.gif");
+//imagegif($oimg, "$imgRoot/$fName.gif");
 
 
 function getBoundrayArea($res) {
@@ -173,6 +191,7 @@ function getBoundrayArea($res) {
 		$poSumPre = $poSum;
 	}
 }
+
 function dumpRGB($rgb) {
 	$r = ($rgb >> 16) & 0xFF;
 	$g = ($rgb >> 8) & 0xFF;
@@ -180,4 +199,69 @@ function dumpRGB($rgb) {
 	return [$r, $g, $b];
 }
 
-echo gettimeofday(true) - $st;
+function getVector($pRes) {
+	global $rgbWhite;
+	$width = imagesx($pRes);
+	$height = imagesy($pRes);
+	$vector = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+	$bx = [floor($width/4)-1,floor($width/4)*2-1,floor($width/4)*3-1,$width-1];
+	$by = [floor($height/4)-1,floor($height/4)*2-1,floor($height/4)*3-1,$height-1];
+	if ($width % 4 == 2) {
+		$bx[2]+=2;
+		$bx[1]+=1;
+	}
+	if ($width % 4 == 3) {
+		$bx[2]+=3;
+		$bx[1]+=2;
+		$bx[0]+=1;
+	}
+	if ($height % 4 == 2) {
+		$by[2]+=2;
+		$by[1]+=1;
+	}
+	if ($height % 4 == 3) {
+		$by[2]+=3;
+		$by[1]+=2;
+		$by[0]+=1;
+	}
+	for ($xx = 0; $xx < count($bx); $xx++) {
+		for($yy = 0; $yy < count($by); $yy++) {
+			$piTotal = 0;
+			$piColor = 0;
+			$xTo = $bx[$xx];
+			$yTo = $by[$yy];
+			$xFrom = ($xx == 0 ? 0 : $bx[$xx - 1] + 1);
+			$yFrom = ($yy == 0 ? 0 : $by[$yy - 1] + 1);
+			for($x = $xFrom; $x <= $xTo; $x++) {
+				for($y = $yFrom; $y <= $yTo; $y++) {
+					$piTotal++;
+					$rgb = imagecolorat($pRes, $x, $y);
+					if ($rgb != $rgbWhite && $rgb != 16645629) {
+						$piColor++;
+					}
+				}
+			}
+			$vector[$xx*count($bx)+$yy] = intval($piColor/$piTotal*100);
+		}
+	}
+	return $vector;
+}
+
+function doOcr($vector) {
+	global $chasLib;
+	$minDist = 10000000;
+	$probChar = ''; 
+	foreach($chasLib as $char => $vectors) {
+		for($i = 0; $i < count($vectors); $i++) {
+			$dist = 0;
+			for($j = 0; $j < count($vectors[$i]); $j++) {
+				$dist += (($vectors[$i][$j]-$vector[$j])*($vectors[$i][$j]-$vector[$j]));
+			}
+			if ($dist < $minDist) {
+				$minDist = $dist;
+				$probChar = $char;
+			}
+		}
+	}
+	return $probChar;
+}
