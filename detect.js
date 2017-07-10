@@ -451,7 +451,9 @@ var CFRobot = function(user){
 			var code = (Fs.readFileSync(_resFile, {encoding:'utf8'}).replace(/^\s+|\s+$/g, ''));
 			if (true || code.length == 4) {
 				timeLog('[Event:car.captcha][User:'+_ref.userName+'][Id:'+_ref.id+'][Car:' + car.borrowName + ']Get captcha code=' + code);
-				_ref.events.emit('pay.url', car, token, num, code);
+				setTimeout(function() {
+					_ref.events.emit('pay.url', car, token, num, code);
+				}, 1);
 				this.close();
 			}
 		});
@@ -928,9 +930,12 @@ if (userList.length <= 1) {
 	}
 	paySubmitWait = 5000;
 }
-var workerNum = 10;
+var workerNum = 5;
 var sLock = [];
 for(i in userList) {
+	if (userList[i][0] == '#') {
+		continue;
+	}
 	var user = userList[i].split('|');
 	sLock[user[0]] = 0;
 	robots = [];
@@ -1007,7 +1012,7 @@ var detectDispatched = { length: 0 };
 					break;
 				}
 			}
-			if (detectDispatched.length >= workerNum) {
+			if (detectDispatched.length >= 10) {
 				timeLog('[Detector:listen]Dispatched done, total=' + detectDispatched.length);
 				return;
 			}
