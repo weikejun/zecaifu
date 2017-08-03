@@ -418,7 +418,7 @@ var CFRobot = function(user){
 		var options = {
 			hostname: "www.zecaifu.com",
 			port: 443,
-			path: "/investorCode?" + Math.random(),
+			path: "/code?" + Math.random(),
 			method: "GET",
 			headers: {
 				'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.152 Safari/537.36',
@@ -437,6 +437,11 @@ var CFRobot = function(user){
 			res.on('data', (chunk) => { _chunks.push(chunk); });
 			res.on('end', () => {
 				Fs.writeFileSync(_capFile, Buffer.concat(_chunks));
+				var _filePath = "captcha-" + _ref.userName + '-' + car.sid;
+				Cmd.execSync("php tools/pre_captcha.php "  + _filePath);
+				//Cmd.execSync("./auto_ocr.sh " + _filePath);
+				var ntime = (new Date()).getTime().toString().substr(0, 10);
+				Fs.utimesSync(_capFile, ntime, ntime);
 				//CaptchaHacker.decode(Buffer.concat(_chunks), _resFile, _capFile);
 			});
 		});
@@ -444,9 +449,11 @@ var CFRobot = function(user){
 		Fs.chmodSync(_resFile, 1023);
 		Fs.watch(_resFile, function(eType, fName) {
 			var code = (Fs.readFileSync(_resFile, {encoding:'utf8'}).replace(/^\s+|\s+$/g, ''));
-			if (code.length == 4) {
+			if (true || code.length == 4) {
 				timeLog('[Event:car.captcha][User:'+_ref.userName+'][Id:'+_ref.id+'][Car:' + car.borrowName + ']Get captcha code=' + code);
-				_ref.events.emit('pay.url', car, token, num, code);
+				setTimeout(function() {
+					_ref.events.emit('pay.url', car, token, num, code);
+				}, 1);
 				this.close();
 			}
 		});
@@ -953,7 +960,7 @@ var detectDispatched = { length: 0 };
 (doDetect = function() { // 创建监听器
 	var _ts = new Date();
 	var _waitElapse = 5;
-	if (_ts.getSeconds() % 5 != 0 && _ts.getSeconds() % 4 != 0) {
+	if (_ts.getSeconds() % 5 != 0) {
 		setTimeout(function() {
 			doDetect();
 		}, _waitElapse);
