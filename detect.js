@@ -438,7 +438,7 @@ var CFRobot = function(user){
 			res.on('end', () => {
 				Fs.writeFileSync(_capFile, Buffer.concat(_chunks));
 				var _filePath = "captcha-" + _ref.userName + '-' + car.sid;
-				Cmd.execSync("php tools/pre_captcha.php "  + _filePath);
+				Cmd.execSync("php tools/car_captcha.php "  + _filePath);
 				//Cmd.execSync("./auto_ocr.sh " + _filePath);
 				var ntime = (new Date()).getTime().toString().substr(0, 10);
 				Fs.utimesSync(_capFile, ntime, ntime);

@@ -10,7 +10,7 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="Cache-Control" content="no-siteapp" />
   <link rel="alternate icon" type="image/png" href="/i/favicon.png">
-  <link rel="stylesheet" href="/css/amazeui.min.css"/>
+  <link rel="stylesheet" href="../css/amazeui.min.css"/>
   <style>
     .header {
       text-align: center;
@@ -48,10 +48,10 @@
     <script>var dt=new Date();document.write('<p>© '+dt.getFullYear()+' Jimwei </p>');</script>
   </div>
 </div>
-<script src="/js/jquery-3.1.1.min.js"></script>
+<script src="../js/jquery-3.1.1.min.js"></script>
 <script>
 var srvTime = 0;
-var inputTpl = '<label id="lable_captcha[$FILE_NAME$]" for="captcha[$FILE_NAME$]"><img style="width:231px;height:84px" id="img_captcha[$FILE_NAME$]" src="$IMG_SRC$"></label><input autocomplete="off" type="text" name="captcha[$FILE_NAME$]" id="captcha[$FILE_NAME$]" value="$CAP_CODE$" onblur="blurSubmit(this);" onkeyup="autoSub(this)">';
+var inputTpl = '<label id="lable_captcha[$FILE_NAME$]" for="captcha[$FILE_NAME$]"><img style="width:231px;height:84px" id="img_captcha[$FILE_NAME$]" src="../$IMG_SRC$"></label><input autocomplete="off" type="text" name="captcha[$FILE_NAME$]" id="captcha[$FILE_NAME$]" value="$CAP_CODE$" onblur="blurSubmit(this);" onkeyup="autoSub(this)">';
 function blurSubmit(inst) {
 	$.ajax({
 		url: "singleSub.php?"+$(inst).attr('id')+"="+$(inst).val(),
