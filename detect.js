@@ -418,7 +418,7 @@ var CFRobot = function(user){
 		var options = {
 			hostname: "www.zecaifu.com",
 			port: 443,
-			path: "/code?" + Math.random(),
+			path: "/investorCode?" + Math.random(),
 			method: "GET",
 			headers: {
 				'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.152 Safari/537.36',
@@ -453,7 +453,7 @@ var CFRobot = function(user){
 				timeLog('[Event:car.captcha][User:'+_ref.userName+'][Id:'+_ref.id+'][Car:' + car.borrowName + ']Get captcha code=' + code);
 				setTimeout(function() {
 					_ref.events.emit('pay.url', car, token, num, code);
-				}, 1);
+				}, 1500);
 				this.close();
 			}
 		});

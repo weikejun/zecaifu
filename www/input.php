@@ -62,7 +62,7 @@ function blurSubmit(inst) {
 	});	
 };
 function autoSub(inst) {
-	if ($(inst).val().length == 4) {
+	if ($(inst).val().length >= 4) {
 		blurSubmit(inst);
 		var fo = false;
 		$(':text').each(function() {

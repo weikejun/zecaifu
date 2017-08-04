@@ -41,10 +41,10 @@ for($x = 0; $x < $imgInfo[0]; $x++) {
 	}
 }
 
-$scalePixel = 0;
-$timg = imagecreate($imgInfo[0], $imgInfo[1] + $scalePixel);
+$scalePixel = 10;
+$timg = imagecreate($imgInfo[0] + $scalePixel, $imgInfo[1] + $scalePixel);
 imagecolorallocate($timg, 255, 255, 255);
-imagecopy($timg, $imgRes, 0, $scalePixel/2, 0, 0, $imgInfo[0], $imgInfo[1]);
+imagecopy($timg, $imgRes, $scalePixel/2, $scalePixel/2, 0, 0, $imgInfo[0], $imgInfo[1]);
 $imgRes = $timg;
 
 $poSumPre = 0;
