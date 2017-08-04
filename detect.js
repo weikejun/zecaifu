@@ -930,7 +930,7 @@ if (userList.length <= 1) {
 	}
 	paySubmitWait = 5000;
 }
-var workerNum = 5;
+var workerNum = 4;
 var sLock = [];
 for(i in userList) {
 	if (userList[i][0] == '#') {
@@ -1012,7 +1012,7 @@ var detectDispatched = { length: 0 };
 					break;
 				}
 			}
-			if (detectDispatched.length >= 10) {
+			if (detectDispatched.length >= 4) {
 				timeLog('[Detector:listen]Dispatched done, total=' + detectDispatched.length);
 				return;
 			}
