@@ -5,7 +5,7 @@ $fName = $argv[1];
 $imgInfo = getimagesize("$imgRoot/$fName.png");
 $imgRes = imagecreatefrompng("$imgRoot/$fName.png");
 
-$vectors = file(dirname(__FILE__).'/words_vec.uni.dat');
+$vectors = file(dirname(__FILE__).'/car_words_vec.uni.dat');
 $chasLib = [];
 foreach($vectors as $vector) {
 	list($word, $cha) = explode("|", $vector);
@@ -26,16 +26,16 @@ for($x = 0; $x < $imgInfo[0]; $x++) {
 		}
 	}
 }
-$colors = (array_flip($colors));
-krsort($colors);
-$colors = array_values($colors);
+arsort($colors);
+$colors = array_slice($colors, 1, 4, true);
+$colors = array_keys($colors);
 for($x = 0; $x < $imgInfo[0]; $x++) {
 	for($y = 0; $y < $imgInfo[1]; $y++) {
 		$rgb = ImageColorAt($imgRes, $x, $y);
-		if ($rgb != $colors[1] 
+		if ($rgb != $colors[0] 
+			&& $rgb != $colors[1] 
 			&& $rgb != $colors[2] 
-			&& $rgb != $colors[3] 
-			&& $rgb != $colors[4]){
+			&& $rgb != $colors[3]){
 			ImageSetPixel($imgRes, $x, $y, $rgbWhite);
 		}
 	}
