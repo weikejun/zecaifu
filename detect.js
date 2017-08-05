@@ -121,6 +121,7 @@ var CFRobot = function(user){
 	this.id = user.id; // robot id
 	this.auth = 0; // 
 	this.events = new Events;
+	this.capRetry = 0;
 	var _ref = this;
 	var _dispatched = false;
 	var _balance = 0;
@@ -455,10 +456,11 @@ var CFRobot = function(user){
 		Fs.watch(_resFile, function(eType, fName) {
 			var code = (Fs.readFileSync(_resFile, {encoding:'utf8'}).replace(/^\s+|\s+$/g, ''));
 			if (true || code.length == 4) {
-				timeLog('[Event:car.captcha][User:'+_ref.userName+'][Id:'+_ref.id+'][Car:' + car.borrowName + ']Get captcha code=' + code);
+				timeLog('[Event:car.captcha][User:'+_ref.userName+'][Id:'+_ref.id+'][Car:' + car.borrowName + ']Get captcha code=' + code + ', retry=' + _ref.capRetry);
 				setTimeout(function() {
 					_ref.events.emit('pay.url', car, token, num, code);
-				}, systemParams.payDelay);
+					_ref.capRetry++;
+				}, _ref.capRetry == 0 ? systemParams.payDelay : 1);
 				this.close();
 			}
 		});
