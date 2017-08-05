@@ -2,7 +2,7 @@
 <html>
 <head lang="en">
   <meta charset="UTF-8">
-  <title>ZeRobot - 首页</title>
+  <title>ZeRobot - 系统参数</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="format-detection" content="telephone=no">
@@ -26,18 +26,42 @@
 </head>
 <body>
 <div class="header">
-
+  
   <hr />
 </div>
 <div class="am-g">
   <div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
-    <h3>导航 - <?php echo $_SERVER['SERVER_ADDR'] ?></h3>
+    <h3>系统参数 - <?php echo $_SERVER['SERVER_ADDR'] ?></h3>
     <hr>
-    <div><a href="strategy.php">策略设置</a> | <a href="user.php">账户设置</a> | <a href="setting.php">系统参数</a> | <a href="input.php">抢标打码</a> | <a href="login/input.php">登录打码</a> | <a href="actLog.php">操作日志</a> | <a href="stat.php">平台待收</a></div>
+    <form id="sub_form" method="post" class="am-form">
+<?php
+$file = dirname(dirname(__FILE__)).'/config/system.dat';
+$systemStr = '';
+if($_POST['systems']) {
+	$output = file_put_contents($file, trim($_POST['systems']));
+	$systemStr = trim($_POST['systems']);
+	echo "<script>alert('".($output !== false ? "success" : "failed")."');location.href = location;</script>";
+}
+else {
+	$lines = null;
+	if(file_exists($file)) {
+		$lines = file($file);
+	}
+	foreach($lines as $line) {
+		$line = trim($line);
+		$systemStr .= $line."\n";
+	}
+} 
+?>
+<textarea style="height:75px" autocomplete="off" name="systems" id="systems"><?php echo htmlspecialchars($systemStr); ?></textarea>
+      <br>
+      <div class="am-cf">
+        <input type="submit" name="" value="提 交" class="am-btn am-btn-primary am-btn-sm am-fl">
+      </div>
+    </form>
     <hr>
     <script>var dt=new Date();document.write('<p>© '+dt.getFullYear()+' Jimwei </p>');</script>
   </div>
 </div>
 </body>
 </html>
-

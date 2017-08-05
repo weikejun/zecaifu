@@ -12,6 +12,11 @@ const Crypto = require('crypto');
 const Cmd = require('child_process');
 var paySubmitWait = 5000;
 var detectorType = process.argv[2] || 'car';
+var systemParams = { 
+	'workerNum': 4,
+	'payDelay': 2000,
+	'detectTs': 60000
+	};
 
 // 通用函数
 var chunkToStr = function(chunk, enc) {
@@ -453,7 +458,7 @@ var CFRobot = function(user){
 				timeLog('[Event:car.captcha][User:'+_ref.userName+'][Id:'+_ref.id+'][Car:' + car.borrowName + ']Get captcha code=' + code);
 				setTimeout(function() {
 					_ref.events.emit('pay.url', car, token, num, code);
-				}, 1500);
+				}, systemParams.payDelay);
 				this.close();
 			}
 		});
@@ -890,6 +895,21 @@ var CFRobot = function(user){
 	});
 };
 
+// 系统参数加载
+// config/system.dat
+timeLog('[Process]Loading system settings');
+var systems = {};
+var systemList = Fs
+	.readFileSync(__dirname + '/config/system.dat', 'utf8')
+	.replace(/(^\s+|\s+$)/g, '')
+	.split("\n");
+for(i in systemList) {
+	var system = systemList[i].replace(/\s+/g, '').split('=');
+	if (system.length == 2) {
+		systemParams[system[0]] = parseInt(system[1]);
+	}
+}
+
 // 配置文件加载
 // config/strategy.dat
 timeLog('[Process]Loading strategys');
@@ -930,7 +950,7 @@ if (userList.length <= 1) {
 	}
 	paySubmitWait = 5000;
 }
-var workerNum = 4;
+var workerNum = systemParams.workerNum;
 var sLock = [];
 for(i in userList) {
 	if (userList[i][0] == '#') {
@@ -1016,7 +1036,7 @@ var startTs = null;
 					break;
 				}
 			}
-			if (startTs && _ts.getTime() - startTs.getTime() > 1000 * 60) {
+			if (startTs && _ts.getTime() - startTs.getTime() > systemParams.detectTs) {
 				timeLog('[Detector:listen]Dispatched done, total=' + detectDispatched.length);
 				return;
 			}

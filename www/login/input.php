@@ -3,7 +3,7 @@
 <html>
 <head lang="en">
   <meta charset="UTF-8">
-  <title>ZeRobot - 登录验证码录入</title>
+  <title>ZeRobot - 登录打码</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="format-detection" content="telephone=no">
@@ -38,7 +38,7 @@
 </div>
 <div class="am-g">
   <div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
-    <h3>登录验证码录入(时间:<span id="now_time">--:--:--</span>)</h3>
+    <h3>登录打码(时间:<span id="now_time">--:--:--</span>)</h3>
     <hr>
     <form id="sub_form" method="post" class="am-form" action="submit.php">
       <div id="inputs"></div>
