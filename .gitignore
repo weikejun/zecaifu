@@ -5,6 +5,7 @@ amount/*
 tigger/*
 *.list*
 config/strategy.dat
+config/system.dat
 user.list
 *.swp
 *.swo
