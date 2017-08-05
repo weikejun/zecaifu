@@ -957,6 +957,7 @@ for(i in userList) {
 
 timeLog('[Process]Create detector, type=' + detectorType);
 var detectDispatched = { length: 0 };
+var startTs = null;
 (doDetect = function() { // 创建监听器
 	var _ts = new Date();
 	var _waitElapse = 5;
@@ -1008,11 +1009,14 @@ var detectDispatched = { length: 0 };
 					}
 					detectDispatched[list[i].sid] = 1;
 					detectDispatched['length']++;
+					if (detectDispatched['length'] == 1) {
+						startTs = new Date();
+					}
 					_waitElapse = 1000;
 					break;
 				}
 			}
-			if (detectDispatched.length >= 4) {
+			if (startTs && _ts.getTime() - startTs.getTime() > 1000 * 60) {
 				timeLog('[Detector:listen]Dispatched done, total=' + detectDispatched.length);
 				return;
 			}
