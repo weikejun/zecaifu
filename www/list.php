@@ -33,9 +33,8 @@
   <div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
     <h3>节点列表</h3>
     <hr>
-    <div><a href="http://101.200.125.62/index.php">101.200.125.62</a></div>
     <div><a href="http://47.93.100.222/index.php">47.93.100.222</a></div>
-    <div><a href="http://182.92.116.75/index.php">182.92.116.75</a></div>
+    <div><a href="http://47.93.184.72/index.php">47.93.184.72</a></div>
     <div><a href="http://118.190.23.53/zecaifu/index.php">118.190.23.53</a></div>
     <hr>
     <script>var dt=new Date();document.write('<p>© '+dt.getFullYear()+' Jimwei </p>');</script>
