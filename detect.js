@@ -990,7 +990,7 @@ var startTs = null;
 (doDetect = function() { // 创建监听器
 	var _ts = new Date();
 	var _waitElapse = 5;
-	if (_ts.getSeconds() % 5 != 0) {
+	if (_ts.getSeconds() % 5 != 0 && _ts.getSeconds % 5 != 4) {
 		setTimeout(function() {
 			doDetect();
 		}, _waitElapse);
