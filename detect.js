@@ -122,6 +122,7 @@ var CFRobot = function(user){
 	this.auth = 0; // 
 	this.events = new Events;
 	this.capRetry = 0;
+	this.loginRetry = 0;
 	var _ref = this;
 	var _dispatched = false;
 	var _balance = 0;
@@ -290,9 +291,15 @@ var CFRobot = function(user){
 				_ref.setCookie(res.headers['set-cookie'], options.hostname);
 				var match = _ref.cookies['www.zecaifu.com'].match(/username=/);
 				if (!match) {
+					if (_ref.loginRetry >= 5) {
+						timeLog('[Event:user.login.submit][User:'+_ref.userName+'][Id:'+_ref.id+']Login error, retry=' + _ref.loginRetry);
+						return;
+					}
 					if (code) {
-					timeLog('[Event:user.login.submit][User:'+_ref.userName+'][Id:'+_ref.id+']Captcha error');
+						timeLog('[Event:user.login.submit][User:'+_ref.userName+'][Id:'+_ref.id+']Captcha error, retry=' + _ref.loginRetry);
+
 						_ref.events.emit('user.captcha', token, true);
+						_ref.loginRetry++;
 					} else {
 						_ref.events.emit('user.login');
 					}
